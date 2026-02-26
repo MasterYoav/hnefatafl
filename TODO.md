@@ -1,0 +1,4 @@
+- [ ] Add movement path blocking rules and capture mechanics.
+- [ ] Add Android launcher Activity using shared UI.
+- [ ] Add iOS app host target and Xcode integration docs.
+- [ ] Add snapshot tests for board rendering.
