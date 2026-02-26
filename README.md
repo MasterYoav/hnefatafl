@@ -14,10 +14,36 @@ Kotlin Compose Multiplatform foundation for a modern Vikings Chess app, managed 
 
 ## Quick start
 
+### macOS
+
+1. Install Java 17+ (Temurin recommended).
+2. From repo root:
+
 ```bash
 ./gradlew verify
 ./gradlew :app-desktop:run
 ```
+
+If `gradlew` is not executable:
+
+```bash
+chmod +x gradlew
+```
+
+### Windows (PowerShell)
+
+1. Install Java 17+ (Temurin recommended).
+2. From repo root:
+
+```powershell
+.\gradlew.bat verify
+.\gradlew.bat :app-desktop:run
+```
+
+### Notes
+
+- First run may take longer while Gradle downloads dependencies.
+- If `JAVA_HOME` is missing on Windows, set it to your JDK path and reopen terminal.
 
 ## Architecture
 
