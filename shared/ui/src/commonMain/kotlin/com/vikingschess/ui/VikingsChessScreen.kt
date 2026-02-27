@@ -41,7 +41,7 @@ fun VikingsChessApp(viewModel: BoardViewModel = remember { BoardViewModel() }) {
     val ui = viewModel.uiState
     val state = ui.game
 
-    val bg = Color.Transparent
+    val bg = if (ui.isDarkMode) Color(0xFF0B1220) else Color(0xFFF4F7FB)
     val surface = if (ui.isDarkMode) Color(0x4D1E2530) else Color(0x66FFFFFF)
     val textPrimary = if (ui.isDarkMode) Color(0xFFF2F4F8) else Color(0xFF121722)
     val textSecondary = if (ui.isDarkMode) Color(0xFFB6BCC8) else Color(0xFF3B465B)
@@ -226,9 +226,9 @@ private fun GlassButton(
 
     Box(
         modifier = Modifier
-            .clip(RoundedCornerShape(14.dp))
+            .clip(RoundedCornerShape(10.dp))
             .background(Brush.verticalGradient(listOf(top, bottom)))
-            .border(1.dp, outline, RoundedCornerShape(14.dp))
+            .border(1.dp, outline, RoundedCornerShape(10.dp))
             .clickable(
                 enabled = enabled,
                 interactionSource = interaction,
