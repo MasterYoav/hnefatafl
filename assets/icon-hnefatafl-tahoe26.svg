@@ -1,57 +1,53 @@
 <svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="bg" x1="80" y1="40" x2="940" y2="980" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#0F1B33"/>
-      <stop offset="1" stop-color="#0A1224"/>
+    <linearGradient id="bg" x1="120" y1="70" x2="900" y2="960" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F1D38"/>
+      <stop offset="1" stop-color="#081023"/>
     </linearGradient>
-    <linearGradient id="glass" x1="220" y1="180" x2="820" y2="840" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#D9E9FF" stop-opacity="0.35"/>
-      <stop offset="1" stop-color="#9CB8E8" stop-opacity="0.12"/>
+    <linearGradient id="panel" x1="250" y1="210" x2="780" y2="820" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D7E6FF" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#A6C0EA" stop-opacity="0.08"/>
     </linearGradient>
-    <radialGradient id="gold" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(512 512) rotate(90) scale(220)">
-      <stop stop-color="#FFD978"/>
-      <stop offset="1" stop-color="#C79A3A"/>
+    <radialGradient id="king" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(512 512) rotate(90) scale(170)">
+      <stop stop-color="#FFD97A"/>
+      <stop offset="1" stop-color="#C78F2D"/>
     </radialGradient>
   </defs>
 
-  <rect x="42" y="42" width="940" height="940" rx="210" fill="url(#bg)"/>
-  <rect x="86" y="86" width="852" height="852" rx="176" stroke="#CFE1FF" stroke-opacity="0.35" stroke-width="3"/>
+  <rect x="36" y="36" width="952" height="952" rx="220" fill="url(#bg)"/>
+  <rect x="36" y="36" width="952" height="952" rx="220" stroke="#D5E3FF" stroke-opacity="0.3" stroke-width="3"/>
 
-  <rect x="188" y="188" width="648" height="648" rx="120" fill="url(#glass)" stroke="#D6E6FF" stroke-opacity="0.35" stroke-width="2"/>
+  <rect x="210" y="210" width="604" height="604" rx="120" fill="url(#panel)"/>
+  <rect x="250" y="250" width="524" height="524" rx="86" fill="#1D2A44" fill-opacity="0.95"/>
 
-  <!-- board grid -->
-  <g opacity="0.6">
-    <rect x="274" y="274" width="476" height="476" rx="46" fill="#1E2B45"/>
-    <g stroke="#AFC7EE" stroke-opacity="0.28" stroke-width="3">
-      <line x1="317" y1="274" x2="317" y2="750"/>
-      <line x1="360" y1="274" x2="360" y2="750"/>
-      <line x1="403" y1="274" x2="403" y2="750"/>
-      <line x1="446" y1="274" x2="446" y2="750"/>
-      <line x1="489" y1="274" x2="489" y2="750"/>
-      <line x1="532" y1="274" x2="532" y2="750"/>
-      <line x1="575" y1="274" x2="575" y2="750"/>
-      <line x1="618" y1="274" x2="618" y2="750"/>
-      <line x1="661" y1="274" x2="661" y2="750"/>
-      <line x1="704" y1="274" x2="704" y2="750"/>
+  <g stroke="#AFC6EE" stroke-opacity="0.24" stroke-width="3">
+    <line x1="297" y1="250" x2="297" y2="774"/>
+    <line x1="344" y1="250" x2="344" y2="774"/>
+    <line x1="391" y1="250" x2="391" y2="774"/>
+    <line x1="438" y1="250" x2="438" y2="774"/>
+    <line x1="485" y1="250" x2="485" y2="774"/>
+    <line x1="532" y1="250" x2="532" y2="774"/>
+    <line x1="579" y1="250" x2="579" y2="774"/>
+    <line x1="626" y1="250" x2="626" y2="774"/>
+    <line x1="673" y1="250" x2="673" y2="774"/>
+    <line x1="720" y1="250" x2="720" y2="774"/>
 
-      <line x1="274" y1="317" x2="750" y2="317"/>
-      <line x1="274" y1="360" x2="750" y2="360"/>
-      <line x1="274" y1="403" x2="750" y2="403"/>
-      <line x1="274" y1="446" x2="750" y2="446"/>
-      <line x1="274" y1="489" x2="750" y2="489"/>
-      <line x1="274" y1="532" x2="750" y2="532"/>
-      <line x1="274" y1="575" x2="750" y2="575"/>
-      <line x1="274" y1="618" x2="750" y2="618"/>
-      <line x1="274" y1="661" x2="750" y2="661"/>
-      <line x1="274" y1="704" x2="750" y2="704"/>
-    </g>
+    <line x1="250" y1="297" x2="774" y2="297"/>
+    <line x1="250" y1="344" x2="774" y2="344"/>
+    <line x1="250" y1="391" x2="774" y2="391"/>
+    <line x1="250" y1="438" x2="774" y2="438"/>
+    <line x1="250" y1="485" x2="774" y2="485"/>
+    <line x1="250" y1="532" x2="774" y2="532"/>
+    <line x1="250" y1="579" x2="774" y2="579"/>
+    <line x1="250" y1="626" x2="774" y2="626"/>
+    <line x1="250" y1="673" x2="774" y2="673"/>
+    <line x1="250" y1="720" x2="774" y2="720"/>
   </g>
 
-  <!-- center king token -->
-  <circle cx="512" cy="512" r="64" fill="url(#gold)"/>
-  <circle cx="512" cy="512" r="64" stroke="#FFE8B0" stroke-opacity="0.85" stroke-width="3"/>
-  <path d="M472 526H552M482 526L492 495L512 514L532 495L542 526" stroke="#6F4F19" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="512" cy="512" r="86" fill="url(#king)"/>
+  <circle cx="512" cy="512" r="86" stroke="#FFECC3" stroke-opacity="0.88" stroke-width="3"/>
+  <path d="M458 534H566M472 534L485 495L512 520L539 495L552 534" stroke="#6F4C18" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
 
-  <!-- viking vibe rune mark -->
-  <path d="M512 146L548 208H476L512 146Z" fill="#D8B56A" fill-opacity="0.9"/>
+  <!-- subtle rune accent -->
+  <path d="M512 120L548 186H476L512 120Z" fill="#DBBC74" fill-opacity="0.9"/>
 </svg>

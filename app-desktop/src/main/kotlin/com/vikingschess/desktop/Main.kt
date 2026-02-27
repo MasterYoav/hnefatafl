@@ -11,9 +11,6 @@ import androidx.compose.ui.window.application
 import com.vikingschess.ui.VikingsChessApp
 import java.awt.FileDialog
 import java.awt.Frame
-import java.awt.event.ComponentAdapter
-import java.awt.event.ComponentEvent
-import java.awt.geom.RoundRectangle2D
 import java.io.File
 import javax.swing.JColorChooser
 import org.jetbrains.skia.Image
@@ -28,8 +25,6 @@ fun main() = application {
         var isDarkMode by mutableStateOf(true)
         var dragStartPointer = java.awt.Point(0, 0)
         var dragStartWindow = java.awt.Point(0, 0)
-        applyRoundedWindow(window)
-
         VikingsChessApp(
             onPickImage = { pickImagePath(window) },
             onPickColor = { current -> pickColorHex(window as? Frame, current) },
@@ -99,13 +94,3 @@ private fun loadImagePainter(path: String): Painter? {
     }.getOrNull()
 }
 
-private fun applyRoundedWindow(window: java.awt.Window, arc: Double = 28.0) {
-    fun updateShape() {
-        window.shape = RoundRectangle2D.Double(0.0, 0.0, window.width.toDouble(), window.height.toDouble(), arc, arc)
-    }
-    window.addComponentListener(object : ComponentAdapter() {
-        override fun componentResized(e: ComponentEvent?) = updateShape()
-        override fun componentMoved(e: ComponentEvent?) = updateShape()
-    })
-    updateShape()
-}

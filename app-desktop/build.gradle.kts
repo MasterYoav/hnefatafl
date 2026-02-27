@@ -18,7 +18,7 @@ compose.desktop {
 
         nativeDistributions {
             packageName = "Hnefatafl"
-            packageVersion = "1.0.2"
+            packageVersion = "1.0.3"
             description = "Modern Hnefatafl with polished desktop UI"
             copyright = "© Yoav"
             vendor = "MasterYoav"
