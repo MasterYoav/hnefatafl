@@ -1,3 +1,5 @@
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.compose.multiplatform)
@@ -13,5 +15,20 @@ dependencies {
 compose.desktop {
     application {
         mainClass = "com.vikingschess.desktop.MainKt"
+
+        nativeDistributions {
+            packageName = "Hnefatafl"
+            packageVersion = "1.0.0"
+            description = "Modern Hnefatafl with polished desktop UI"
+            copyright = "© Yoav"
+            vendor = "MasterYoav"
+            includeAllModules = true
+
+            targetFormats(
+                TargetFormat.Dmg,
+                TargetFormat.Exe,
+                TargetFormat.Deb,
+            )
+        }
     }
 }

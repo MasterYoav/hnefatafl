@@ -1,0 +1,56 @@
+name: Release Desktop 1.0
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Grant execute permission
+        if: runner.os != 'Windows'
+        run: chmod +x gradlew
+
+      - name: Build native package for current OS
+        run: ./gradlew :app-desktop:packageDistributionForCurrentOS
+        shell: bash
+
+      - name: Collect artifacts
+        shell: bash
+        run: |
+          mkdir -p release-assets
+          find app-desktop/build/compose/binaries/main -type f \( -name "*.dmg" -o -name "*.exe" -o -name "*.msi" -o -name "*.deb" \) -print -exec cp {} release-assets/ \;
+          ls -la release-assets
+
+      - name: Upload artifact (workflow)
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.os }}
+          path: release-assets/*
+
+      - name: Attach binaries to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-assets/*
+          generate_release_notes: true
+          draft: false
+          prerelease: false
