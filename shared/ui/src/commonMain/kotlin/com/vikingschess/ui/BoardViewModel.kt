@@ -10,12 +10,18 @@ import com.vikingschess.logic.Position
 data class VikingsChessUiState(
     val game: GameState,
     val isDarkMode: Boolean = true,
+    val highlightedMoves: Set<Position> = emptySet(),
 )
 
 class BoardViewModel(
     private val engine: GameEngine = GameEngine(),
 ) {
-    var uiState: VikingsChessUiState by mutableStateOf(VikingsChessUiState(engine.state()))
+    var uiState: VikingsChessUiState by mutableStateOf(
+        VikingsChessUiState(
+            game = engine.state(),
+            highlightedMoves = emptySet(),
+        ),
+    )
         private set
 
     fun onCellTapped(position: Position) {
@@ -49,6 +55,14 @@ class BoardViewModel(
     }
 
     private fun sync() {
-        uiState = uiState.copy(game = engine.state())
+        val game = engine.state()
+        val highlightedMoves = game.selected
+            ?.let(engine::legalMoves)
+            ?.toSet()
+            .orEmpty()
+        uiState = uiState.copy(
+            game = game,
+            highlightedMoves = highlightedMoves,
+        )
     }
 }

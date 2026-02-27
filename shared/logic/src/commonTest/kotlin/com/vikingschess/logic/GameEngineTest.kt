@@ -115,6 +115,38 @@ class GameEngineTest {
     }
 
     @Test
+    fun `king on edge is captured by three attackers`() {
+        val board = emptyBoardWith(
+            attackers = listOf(Position(0, 4), Position(0, 6), Position(3, 5)),
+            defenders = emptyList(),
+            king = Position(0, 5),
+        )
+        val engine = GameEngine(GameState(board = board, currentTurn = Player.ATTACKER))
+
+        engine.select(Position(3, 5))
+        val moved = engine.moveSelected(Position(1, 5))
+
+        assertTrue(moved)
+        assertEquals(Winner.ATTACKERS, engine.state().winner)
+    }
+
+    @Test
+    fun `king on edge is not captured with only two attackers`() {
+        val board = emptyBoardWith(
+            attackers = listOf(Position(0, 6), Position(3, 5)),
+            defenders = emptyList(),
+            king = Position(0, 5),
+        )
+        val engine = GameEngine(GameState(board = board, currentTurn = Player.ATTACKER))
+
+        engine.select(Position(3, 5))
+        val moved = engine.moveSelected(Position(1, 5))
+
+        assertTrue(moved)
+        assertNull(engine.state().winner)
+    }
+
+    @Test
     fun `undo restores previous position and turn`() {
         val engine = GameEngine()
         val before = engine.state()

@@ -1,5 +1,7 @@
 package com.vikingschess.ui
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -22,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -79,6 +82,7 @@ fun VikingsChessApp(viewModel: BoardViewModel = remember { BoardViewModel() }) {
                             val piece = state.board[pos]
                             val selected = state.selected == pos
                             val isCorner = state.board.isCorner(pos)
+                            val isMoveHint = pos in ui.highlightedMoves
                             val cellBg = when {
                                 isCorner -> if (ui.isDarkMode) Color(0xFF7E5D2B) else Color(0xFFE6C37A)
                                 (row + col) % 2 == 0 -> if (ui.isDarkMode) Color(0xFF2B313A) else Color(0xFFDCE4F0)
@@ -92,12 +96,25 @@ fun VikingsChessApp(viewModel: BoardViewModel = remember { BoardViewModel() }) {
                                     .background(cellBg)
                                     .border(
                                         width = if (selected) 2.dp else 1.dp,
-                                        color = if (selected) Color(0xFF9AE8C5) else Color(0x33000000),
+                                        color = when {
+                                            selected -> Color(0xFF9AE8C5)
+                                            isMoveHint -> if (ui.isDarkMode) Color(0xFF7CEEC4) else Color(0xFF2C8F72)
+                                            else -> Color(0x33000000)
+                                        },
                                         shape = RoundedCornerShape(10.dp),
                                     )
                                     .clickable { viewModel.onCellTapped(pos) },
                                 contentAlignment = Alignment.Center,
                             ) {
+                                if (isMoveHint && piece.type == PieceType.EMPTY) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(9.dp)
+                                            .clip(CircleShape)
+                                            .background(if (ui.isDarkMode) Color(0xB37CEEC4) else Color(0x992C8F72)),
+                                    )
+                                }
+
                                 if (piece.type != PieceType.EMPTY) {
                                     val pieceColor = when (piece.type) {
                                         PieceType.ATTACKER -> Color(0xFFD64545)
@@ -105,8 +122,13 @@ fun VikingsChessApp(viewModel: BoardViewModel = remember { BoardViewModel() }) {
                                         PieceType.KING -> Color(0xFFFFD66E)
                                         PieceType.EMPTY -> Color.Transparent
                                     }
+                                    val pieceScale = animateFloatAsState(
+                                        targetValue = if (selected) 1.08f else 1f,
+                                        animationSpec = spring(dampingRatio = 0.62f, stiffness = 460f),
+                                    )
                                     Box(
                                         modifier = Modifier
+                                            .scale(pieceScale.value)
                                             .size(if (piece.type == PieceType.KING) 29.dp else 25.dp)
                                             .clip(CircleShape)
                                             .background(

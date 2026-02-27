@@ -137,9 +137,10 @@ class GameEngine(
             Position(king.row - 1, king.col),
             Position(king.row, king.col + 1),
             Position(king.row, king.col - 1),
-        )
-        return neighbors.all { pos ->
-            board.isInside(pos) && board[pos].type == PieceType.ATTACKER
+        ).filter(board::isInside)
+
+        return neighbors.size >= 3 && neighbors.all { pos ->
+            board[pos].type == PieceType.ATTACKER
         }
     }
 }
