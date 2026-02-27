@@ -10,7 +10,9 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.vikingschess.ui.VikingsChessApp
 import java.awt.FileDialog
+import java.awt.Frame
 import java.io.File
+import javax.swing.JColorChooser
 import org.jetbrains.skia.Image
 
 fun main() = application {
@@ -26,11 +28,12 @@ fun main() = application {
             window.rootPane.putClientProperty("apple.awt.windowTitleVisible", true)
             window.rootPane.putClientProperty(
                 "apple.awt.windowTitleBarAppearance",
-                if (isDarkMode) "NSAppearanceNameDarkAqua" else "NSAppearanceNameAqua",
+                if (isDarkMode) "NSAppearanceNameVibrantDark" else "NSAppearanceNameAqua",
             )
         }
         VikingsChessApp(
             onPickImage = { pickImagePath(window) },
+            onPickColor = { current -> pickColorHex(window as? Frame, current) },
             imagePainter = ::loadImagePainter,
             onThemeChanged = { isDarkMode = it },
         )
@@ -46,6 +49,14 @@ private fun pickImagePath(window: java.awt.Window): String? {
     val fileName = dialog.getFile() ?: return null
     val directory = dialog.getDirectory() ?: return null
     return File(directory, fileName).absolutePath
+}
+
+private fun pickColorHex(frame: Frame?, currentHex: String): String? {
+    val initial = runCatching {
+        java.awt.Color.decode(if (currentHex.startsWith("#")) currentHex else "#$currentHex")
+    }.getOrNull() ?: java.awt.Color.WHITE
+    val chosen = JColorChooser.showDialog(frame, "Choose color", initial) ?: return null
+    return String.format("#%02X%02X%02X", chosen.red, chosen.green, chosen.blue)
 }
 
 private fun loadImagePainter(path: String): Painter? {

@@ -74,39 +74,41 @@ class BoardViewModel(
             PawnColorTarget.DEFENDER -> pawn.copy(defenderHex = value)
             PawnColorTarget.KING -> pawn.copy(kingHex = value)
         }
-        uiState = uiState.copy(settingsDraft = uiState.settingsDraft.copy(pawnColors = updated))
+        val nextDraft = uiState.settingsDraft.copy(pawnColors = updated)
+        uiState = uiState.copy(settingsDraft = nextDraft)
+        commitDraftIfValid()
     }
 
     fun updateBackgroundMode(mode: BackgroundMode) {
-        uiState = uiState.copy(
-            settingsDraft = uiState.settingsDraft.copy(
-                background = uiState.settingsDraft.background.copy(mode = mode),
-            ),
+        val nextDraft = uiState.settingsDraft.copy(
+            background = uiState.settingsDraft.background.copy(mode = mode),
         )
+        uiState = uiState.copy(settingsDraft = nextDraft)
+        commitDraftIfValid()
     }
 
     fun updateBackgroundSolidHex(value: String) {
-        uiState = uiState.copy(
-            settingsDraft = uiState.settingsDraft.copy(
-                background = uiState.settingsDraft.background.copy(solidHex = value),
-            ),
+        val nextDraft = uiState.settingsDraft.copy(
+            background = uiState.settingsDraft.background.copy(solidHex = value),
         )
+        uiState = uiState.copy(settingsDraft = nextDraft)
+        commitDraftIfValid()
     }
 
     fun updateBackgroundOpacity(value: Float) {
-        uiState = uiState.copy(
-            settingsDraft = uiState.settingsDraft.copy(
-                background = uiState.settingsDraft.background.copy(opacity = value.coerceIn(0.1f, 1f)),
-            ),
+        val nextDraft = uiState.settingsDraft.copy(
+            background = uiState.settingsDraft.background.copy(opacity = value.coerceIn(0.1f, 1f)),
         )
+        uiState = uiState.copy(settingsDraft = nextDraft)
+        commitDraftIfValid()
     }
 
     fun updateBackgroundImagePath(path: String?) {
-        uiState = uiState.copy(
-            settingsDraft = uiState.settingsDraft.copy(
-                background = uiState.settingsDraft.background.copy(imagePath = path),
-            ),
+        val nextDraft = uiState.settingsDraft.copy(
+            background = uiState.settingsDraft.background.copy(imagePath = path),
         )
+        uiState = uiState.copy(settingsDraft = nextDraft)
+        commitDraftIfValid()
     }
 
     fun applySettings(): Boolean {
@@ -119,6 +121,13 @@ class BoardViewModel(
     fun resetSettings() {
         val defaults = defaultUiSettings()
         uiState = uiState.copy(settings = defaults, settingsDraft = defaults)
+    }
+
+    private fun commitDraftIfValid() {
+        val draft = uiState.settingsDraft
+        if (settingsValidation(draft).isValid) {
+            uiState = uiState.copy(settings = draft)
+        }
     }
 
     private fun sync() {

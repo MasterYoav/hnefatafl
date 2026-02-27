@@ -52,6 +52,7 @@ import com.vikingschess.logic.Winner
 fun VikingsChessApp(
     viewModel: BoardViewModel = remember { BoardViewModel() },
     onPickImage: () -> String? = { null },
+    onPickColor: (String) -> String? = { null },
     imagePainter: (String) -> Painter? = { null },
     onThemeChanged: (Boolean) -> Unit = {},
 ) {
@@ -60,12 +61,17 @@ fun VikingsChessApp(
     var showRules by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
 
-    val baseBg = if (ui.isDarkMode) Color(0xFF0B1220) else Color(0xFFF4F7FB)
+    val settings = ui.settings
+    val draft = ui.settingsDraft
+    val transparentMode = settings.background.mode == BackgroundMode.TRANSPARENT
+    val baseBg = when {
+        transparentMode -> Color.Transparent
+        ui.isDarkMode -> Color(0xFF0B1220)
+        else -> Color(0xFFF4F7FB)
+    }
     val surface = if (ui.isDarkMode) Color(0x4D1E2530) else Color(0x66FFFFFF)
     val textPrimary = if (ui.isDarkMode) Color(0xFFF2F4F8) else Color(0xFF121722)
     val textSecondary = if (ui.isDarkMode) Color(0xFFB6BCC8) else Color(0xFF3B465B)
-    val settings = ui.settings
-    val draft = ui.settingsDraft
     val validation = settingsValidation(draft)
 
     val roundedFont = FontFamily.SansSerif
@@ -86,7 +92,7 @@ fun VikingsChessApp(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(solidColor.copy(alpha = settings.background.opacity)),
+                        .background(solidColor),
                 )
             }
             if (settings.background.mode == BackgroundMode.IMAGE && backgroundPainter != null) {
@@ -94,16 +100,21 @@ fun VikingsChessApp(
                     painter = backgroundPainter,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
+            if (settings.background.mode == BackgroundMode.TRANSPARENT) {
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .alpha(settings.background.opacity),
+                        .background(Color(0xCC0B1220).copy(alpha = settings.background.opacity)),
                 )
             }
 
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(start = 16.dp, end = 16.dp, top = 28.dp, bottom = 16.dp),
+                    .padding(start = 16.dp, end = 16.dp, top = 52.dp, bottom = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
@@ -269,17 +280,9 @@ fun VikingsChessApp(
                         onSolidHexChange = viewModel::updateBackgroundSolidHex,
                         onOpacityChange = viewModel::updateBackgroundOpacity,
                         onPickImage = onPickImage,
+                        onPickColor = onPickColor,
                         onImagePathChange = viewModel::updateBackgroundImagePath,
-                        onApply = {
-                            if (viewModel.applySettings()) {
-                                showSettings = false
-                            }
-                        },
-                        onReset = viewModel::resetSettings,
-                        onClose = {
-                            viewModel.cancelSettingsEdit()
-                            showSettings = false
-                        },
+                        onClose = { showSettings = false },
                     )
                 }
             }
@@ -394,9 +397,8 @@ private fun SettingsDialog(
     onSolidHexChange: (String) -> Unit,
     onOpacityChange: (Float) -> Unit,
     onPickImage: () -> String?,
+    onPickColor: (String) -> String?,
     onImagePathChange: (String?) -> Unit,
-    onApply: () -> Unit,
-    onReset: () -> Unit,
     onClose: () -> Unit,
 ) {
     val cardBg = if (isDarkMode) Color(0xEE182333) else Color(0xF7FFFFFF)
@@ -431,6 +433,7 @@ private fun SettingsDialog(
                 errorColor = error,
                 previewFallback = Color(0xFFD64545),
                 onValueChange = { onPawnColorChange(PawnColorTarget.ATTACKER, it) },
+                onPickColor = onPickColor,
             )
             ColorInputRow(
                 label = "Blue team",
@@ -440,6 +443,7 @@ private fun SettingsDialog(
                 errorColor = error,
                 previewFallback = Color(0xFF4B7CF0),
                 onValueChange = { onPawnColorChange(PawnColorTarget.DEFENDER, it) },
+                onPickColor = onPickColor,
             )
             ColorInputRow(
                 label = "King",
@@ -449,9 +453,10 @@ private fun SettingsDialog(
                 errorColor = error,
                 previewFallback = Color(0xFFFFD66E),
                 onValueChange = { onPawnColorChange(PawnColorTarget.KING, it) },
+                onPickColor = onPickColor,
             )
 
-            Text("Background theme", color = textColor, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+            Text("Background", color = textColor, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 ModeChip(
                     label = "Default",
@@ -474,6 +479,13 @@ private fun SettingsDialog(
                     textColor = textColor,
                     onClick = { onBackgroundModeChange(BackgroundMode.IMAGE) },
                 )
+                ModeChip(
+                    label = "Transparent",
+                    selected = draft.background.mode == BackgroundMode.TRANSPARENT,
+                    accent = accent,
+                    textColor = textColor,
+                    onClick = { onBackgroundModeChange(BackgroundMode.TRANSPARENT) },
+                )
             }
 
             if (draft.background.mode == BackgroundMode.SOLID) {
@@ -485,6 +497,7 @@ private fun SettingsDialog(
                     errorColor = error,
                     previewFallback = Color(0xFF0B1220),
                     onValueChange = onSolidHexChange,
+                    onPickColor = onPickColor,
                 )
             }
 
@@ -504,39 +517,20 @@ private fun SettingsDialog(
                 }
             }
 
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text("Background opacity", color = textColor, fontSize = 13.sp)
-                Slider(
-                    value = draft.background.opacity,
-                    onValueChange = onOpacityChange,
-                    valueRange = 0.1f..1f,
-                )
-                Text(
-                    text = "${(draft.background.opacity * 100).toInt()}%",
-                    color = textColor.copy(alpha = 0.75f),
-                    fontSize = 12.sp,
-                )
-            }
-
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                GlassButton(
-                    label = "Apply",
-                    enabled = validation.isValid,
-                    isDarkMode = isDarkMode,
-                    onClick = onApply,
-                )
-                GlassButton(
-                    label = "Reset",
-                    enabled = true,
-                    isDarkMode = isDarkMode,
-                    onClick = onReset,
-                )
-                GlassButton(
-                    label = "Close",
-                    enabled = true,
-                    isDarkMode = isDarkMode,
-                    onClick = onClose,
-                )
+            if (draft.background.mode == BackgroundMode.TRANSPARENT) {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text("Background opacity", color = textColor, fontSize = 13.sp)
+                    Slider(
+                        value = draft.background.opacity,
+                        onValueChange = onOpacityChange,
+                        valueRange = 0.1f..1f,
+                    )
+                    Text(
+                        text = "${(draft.background.opacity * 100).toInt()}%",
+                        color = textColor.copy(alpha = 0.75f),
+                        fontSize = 12.sp,
+                    )
+                }
             }
         }
     }
@@ -551,6 +545,7 @@ private fun ColorInputRow(
     errorColor: Color,
     previewFallback: Color,
     onValueChange: (String) -> Unit,
+    onPickColor: (String) -> String?,
 ) {
     val previewColor = parseHexColorOrNull(value) ?: previewFallback
     val fieldColors = TextFieldDefaults.colors(
@@ -580,7 +575,11 @@ private fun ColorInputRow(
                     .size(22.dp)
                     .clip(CircleShape)
                     .background(previewColor)
-                    .border(1.dp, Color(0x66000000), CircleShape),
+                    .border(1.dp, Color(0x66000000), CircleShape)
+                    .clickable {
+                        val picked = onPickColor(value)
+                        if (picked != null) onValueChange(picked)
+                    },
             )
         }
         if (!isValid) {

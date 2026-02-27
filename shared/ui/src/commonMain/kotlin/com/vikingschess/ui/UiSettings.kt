@@ -6,6 +6,7 @@ enum class BackgroundMode {
     DEFAULT,
     SOLID,
     IMAGE,
+    TRANSPARENT,
 }
 
 enum class PawnColorTarget {
