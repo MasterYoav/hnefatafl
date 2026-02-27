@@ -55,6 +55,7 @@ fun VikingsChessApp(
     onPickColor: (String) -> String? = { null },
     imagePainter: (String) -> Painter? = { null },
     onThemeChanged: (Boolean) -> Unit = {},
+    onTransparencyModeChanged: (Boolean) -> Unit = {},
 ) {
     val ui = viewModel.uiState
     val state = ui.game
@@ -84,7 +85,10 @@ fun VikingsChessApp(
     }
     val solidColor = parseHexColorOrNull(settings.background.solidHex)
 
-    SideEffect { onThemeChanged(ui.isDarkMode) }
+    SideEffect {
+        onThemeChanged(ui.isDarkMode)
+        onTransparencyModeChanged(transparentMode)
+    }
 
     MaterialTheme {
         Box(modifier = Modifier.fillMaxSize().background(baseBg)) {
@@ -123,7 +127,6 @@ fun VikingsChessApp(
                     canUndo = viewModel.canUndo(),
                     onNewGame = viewModel::newGame,
                     onUndo = viewModel::undo,
-                    onToggleTheme = viewModel::toggleTheme,
                     onRules = { showRules = true },
                     onSettings = {
                         viewModel.beginSettingsEdit()
@@ -282,6 +285,8 @@ fun VikingsChessApp(
                         onPickImage = onPickImage,
                         onPickColor = onPickColor,
                         onImagePathChange = viewModel::updateBackgroundImagePath,
+                        onToggleTheme = viewModel::toggleTheme,
+                        isDarkModeState = ui.isDarkMode,
                         onClose = { showSettings = false },
                     )
                 }
@@ -296,7 +301,6 @@ private fun GlassToolbar(
     canUndo: Boolean,
     onNewGame: () -> Unit,
     onUndo: () -> Unit,
-    onToggleTheme: () -> Unit,
     onRules: () -> Unit,
     onSettings: () -> Unit,
 ) {
@@ -308,7 +312,6 @@ private fun GlassToolbar(
     ) {
         GlassButton("New Game", enabled = true, isDarkMode = isDarkMode, onClick = onNewGame)
         GlassButton("Undo", enabled = canUndo, isDarkMode = isDarkMode, onClick = onUndo)
-        GlassButton(if (isDarkMode) "☀️" else "🌙", enabled = true, isDarkMode = isDarkMode, onClick = onToggleTheme)
         GlassButton("Settings", enabled = true, isDarkMode = isDarkMode, onClick = onSettings)
         GlassButton("Game Rules", enabled = true, isDarkMode = isDarkMode, onClick = onRules)
     }
@@ -399,6 +402,8 @@ private fun SettingsDialog(
     onPickImage: () -> String?,
     onPickColor: (String) -> String?,
     onImagePathChange: (String?) -> Unit,
+    onToggleTheme: () -> Unit,
+    isDarkModeState: Boolean,
     onClose: () -> Unit,
 ) {
     val cardBg = if (isDarkMode) Color(0xEE182333) else Color(0xF7FFFFFF)
@@ -422,7 +427,14 @@ private fun SettingsDialog(
                 .clickable(enabled = false) {},
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Text("Settings", color = textColor, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text("Settings", color = textColor, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                GlassButton("✕", enabled = true, isDarkMode = isDarkMode, onClick = onClose)
+            }
 
             Text("Pawn colors", color = textColor, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
             ColorInputRow(
@@ -488,6 +500,15 @@ private fun SettingsDialog(
                 )
             }
 
+            if (draft.background.mode == BackgroundMode.DEFAULT) {
+                GlassButton(
+                    label = if (isDarkModeState) "☀️" else "🌙",
+                    enabled = true,
+                    isDarkMode = isDarkMode,
+                    onClick = onToggleTheme,
+                )
+            }
+
             if (draft.background.mode == BackgroundMode.SOLID) {
                 ColorInputRow(
                     label = "Solid hex",
@@ -523,7 +544,7 @@ private fun SettingsDialog(
                     Slider(
                         value = draft.background.opacity,
                         onValueChange = onOpacityChange,
-                        valueRange = 0.1f..1f,
+                        valueRange = 0f..1f,
                     )
                     Text(
                         text = "${(draft.background.opacity * 100).toInt()}%",

@@ -97,7 +97,7 @@ class BoardViewModel(
 
     fun updateBackgroundOpacity(value: Float) {
         val nextDraft = uiState.settingsDraft.copy(
-            background = uiState.settingsDraft.background.copy(opacity = value.coerceIn(0.1f, 1f)),
+            background = uiState.settingsDraft.background.copy(opacity = value.coerceIn(0f, 1f)),
         )
         uiState = uiState.copy(settingsDraft = nextDraft)
         commitDraftIfValid()

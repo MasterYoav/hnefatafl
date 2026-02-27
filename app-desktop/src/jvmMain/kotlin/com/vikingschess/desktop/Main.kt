@@ -19,7 +19,7 @@ fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
         title = "Hnefatafl",
-        transparent = false,
+        transparent = true,
     ) {
         var isDarkMode by mutableStateOf(true)
         window.rootPane.putClientProperty("apple.awt.transparentTitleBar", true)
@@ -36,6 +36,9 @@ fun main() = application {
             onPickColor = { current -> pickColorHex(window as? Frame, current) },
             imagePainter = ::loadImagePainter,
             onThemeChanged = { isDarkMode = it },
+            onTransparencyModeChanged = { transparent ->
+                window.background = if (transparent) java.awt.Color(0, 0, 0, 0) else java.awt.Color(11, 18, 32, 255)
+            },
         )
     }
 }
