@@ -1,7 +1,8 @@
 # Hnefatafl
 
 Modern **Hnefatafl (Vikings Chess)** built with Kotlin + Compose Multiplatform.
-
+[![Kotlin](https://img.shields.io/badge/Kotlin-%237F52FF.svg?logo=kotlin&logoColor=white)](#)
+[![ChatGPT](https://custom-icon-badges.demolab.com/badge/ChatGPT-74aa9c?logo=openai&logoColor=white)](#)
 <p align="center">
   <img src="assets/icon-hnefatafl-tahoe26.svg" alt="Hnefatafl Icon" width="180" />
 </p>
