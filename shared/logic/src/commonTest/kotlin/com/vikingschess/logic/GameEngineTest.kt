@@ -100,6 +100,22 @@ class GameEngineTest {
     }
 
     @Test
+    fun `edge pawn is captured against board boundary`() {
+        val board = emptyBoardWith(
+            attackers = listOf(Position(2, 0), Position(2, 3)),
+            defenders = listOf(Position(2, 1)),
+            king = Position(5, 5),
+        )
+        val engine = GameEngine(GameState(board = board, currentTurn = Player.ATTACKER))
+
+        engine.select(Position(2, 3))
+        val moved = engine.moveSelected(Position(2, 2))
+
+        assertTrue(moved)
+        assertEquals(PieceType.EMPTY, engine.state().board[Position(2, 1)].type)
+    }
+
+    @Test
     fun `king on corner means defenders win`() {
         val board = emptyBoardWith(
             attackers = listOf(Position(0, 5), Position(10, 5), Position(5, 0), Position(5, 10)),

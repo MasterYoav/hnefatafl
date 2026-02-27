@@ -6,11 +6,14 @@ import androidx.compose.runtime.setValue
 import com.vikingschess.logic.GameEngine
 import com.vikingschess.logic.GameState
 import com.vikingschess.logic.Position
+import com.vikingschess.logic.Winner
 
 data class VikingsChessUiState(
     val game: GameState,
     val isDarkMode: Boolean = true,
     val highlightedMoves: Set<Position> = emptySet(),
+    val redTeamWins: Int = 0,
+    val blueTeamWins: Int = 0,
 )
 
 class BoardViewModel(
@@ -55,14 +58,21 @@ class BoardViewModel(
     }
 
     private fun sync() {
+        val previousWinner = uiState.game.winner
         val game = engine.state()
         val highlightedMoves = game.selected
             ?.let(engine::legalMoves)
             ?.toSet()
             .orEmpty()
+
+        val redWinsIncrement = if (previousWinner == null && game.winner == Winner.ATTACKERS) 1 else 0
+        val blueWinsIncrement = if (previousWinner == null && game.winner == Winner.DEFENDERS) 1 else 0
+
         uiState = uiState.copy(
             game = game,
             highlightedMoves = highlightedMoves,
+            redTeamWins = uiState.redTeamWins + redWinsIncrement,
+            blueTeamWins = uiState.blueTeamWins + blueWinsIncrement,
         )
     }
 }

@@ -91,16 +91,17 @@ class GameEngine(
 
         for (direction in directions) {
             val adjacent = Position(movedTo.row + direction.row, movedTo.col + direction.col)
-            val beyond = Position(movedTo.row + (2 * direction.row), movedTo.col + (2 * direction.col))
-
-            if (!updated.isInside(adjacent) || !updated.isInside(beyond)) continue
+            if (!updated.isInside(adjacent)) continue
 
             val adjacentPiece = updated[adjacent]
-            val beyondPiece = updated[beyond]
-
             if (adjacentPiece.type == PieceType.KING) continue
             if (adjacentPiece.owner != enemy) continue
-            if (beyondPiece.owner == movingPiece.owner) {
+
+            val beyond = Position(movedTo.row + (2 * direction.row), movedTo.col + (2 * direction.col))
+            val capturedBySandwich = updated.isInside(beyond) && updated[beyond].owner == movingPiece.owner
+            val capturedAgainstBoardEdge = !updated.isInside(beyond)
+
+            if (capturedBySandwich || capturedAgainstBoardEdge) {
                 updated = updated.set(adjacent, Piece.Empty)
             }
         }

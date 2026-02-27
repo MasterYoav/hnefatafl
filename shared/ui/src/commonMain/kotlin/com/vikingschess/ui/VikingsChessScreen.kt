@@ -68,6 +68,13 @@ fun VikingsChessApp(viewModel: BoardViewModel = remember { BoardViewModel() }) {
                 fontSize = 15.sp,
             )
 
+            Text(
+                text = "Red Team: ${ui.redTeamWins}   •   Blue Team: ${ui.blueTeamWins}",
+                color = textPrimary,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.SemiBold,
+            )
+
             Column(
                 verticalArrangement = Arrangement.spacedBy(2.dp),
                 modifier = Modifier
@@ -146,7 +153,7 @@ fun VikingsChessApp(viewModel: BoardViewModel = remember { BoardViewModel() }) {
             }
 
             Text(
-                text = "Rule set: 11x11 Hnefatafl · king escapes to corners · four-side king capture",
+                text = "Rule set: 11x11 Hnefatafl · Blue escorts king to corners · Red captures king on 4 sides",
                 color = textPrimary,
                 fontSize = 13.sp,
             )
@@ -209,7 +216,7 @@ private fun GlassButton(
 }
 
 private fun statusText(turn: Player, winner: Winner?): String = when (winner) {
-    Winner.ATTACKERS -> "Attackers win: king captured"
-    Winner.DEFENDERS -> "Defenders win: king escaped"
-    null -> "Turn: $turn"
+    Winner.ATTACKERS -> "Red Team wins: king captured"
+    Winner.DEFENDERS -> "Blue Team wins: king escaped"
+    null -> "Turn: ${if (turn == Player.ATTACKER) "Red Team" else "Blue Team"}"
 }
