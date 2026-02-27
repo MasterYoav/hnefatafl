@@ -56,6 +56,9 @@ fun VikingsChessApp(
     imagePainter: (String) -> Painter? = { null },
     onThemeChanged: (Boolean) -> Unit = {},
     onTransparencyModeChanged: (Boolean) -> Unit = {},
+    onWindowClose: () -> Unit = {},
+    onWindowMinimize: () -> Unit = {},
+    onWindowToggleMaximize: () -> Unit = {},
 ) {
     val ui = viewModel.uiState
     val state = ui.game
@@ -118,10 +121,17 @@ fun VikingsChessApp(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(start = 16.dp, end = 16.dp, top = 52.dp, bottom = 16.dp),
+                    .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
+                CustomTitleBar(
+                    isDarkMode = ui.isDarkMode,
+                    onClose = onWindowClose,
+                    onMinimize = onWindowMinimize,
+                    onToggleMaximize = onWindowToggleMaximize,
+                )
+
                 GlassToolbar(
                     isDarkMode = ui.isDarkMode,
                     canUndo = viewModel.canUndo(),
@@ -292,6 +302,41 @@ fun VikingsChessApp(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun CustomTitleBar(
+    isDarkMode: Boolean,
+    onClose: () -> Unit,
+    onMinimize: () -> Unit,
+    onToggleMaximize: () -> Unit,
+) {
+    val titleColor = if (isDarkMode) Color(0xFFEFF5FF) else Color(0xFF243246)
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Box(
+                modifier = Modifier.size(13.dp).clip(CircleShape).background(Color(0xFFFF5F57)).clickable(onClick = onClose),
+            )
+            Box(
+                modifier = Modifier.size(13.dp).clip(CircleShape).background(Color(0xFFFEBC2E)).clickable(onClick = onMinimize),
+            )
+            Box(
+                modifier = Modifier.size(13.dp).clip(CircleShape).background(Color(0xFF28C840)).clickable(onClick = onToggleMaximize),
+            )
+        }
+        Text(
+            text = "Hnefatafl",
+            color = titleColor,
+            fontSize = 16.sp,
+            fontFamily = FontFamily.SansSerif,
+            fontWeight = FontWeight.Bold,
+        )
+        Box(modifier = Modifier.size(60.dp))
     }
 }
 

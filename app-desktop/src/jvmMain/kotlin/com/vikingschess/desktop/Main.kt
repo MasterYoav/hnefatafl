@@ -19,18 +19,11 @@ fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
         title = "Hnefatafl",
-        transparent = false,
+        undecorated = true,
+        transparent = true,
     ) {
         var isDarkMode by mutableStateOf(true)
-        window.rootPane.putClientProperty("apple.awt.transparentTitleBar", true)
-        window.rootPane.putClientProperty("apple.awt.fullWindowContent", true)
-        if (isMacOs()) {
-            window.rootPane.putClientProperty("apple.awt.windowTitleVisible", true)
-            window.rootPane.putClientProperty(
-                "apple.awt.windowTitleBarAppearance",
-                if (isDarkMode) "NSAppearanceNameVibrantDark" else "NSAppearanceNameAqua",
-            )
-        }
+
         VikingsChessApp(
             onPickImage = { pickImagePath(window) },
             onPickColor = { current -> pickColorHex(window as? Frame, current) },
@@ -38,6 +31,12 @@ fun main() = application {
             onThemeChanged = { isDarkMode = it },
             onTransparencyModeChanged = { transparent ->
                 window.background = if (transparent) java.awt.Color(0, 0, 0, 0) else java.awt.Color(11, 18, 32, 255)
+            },
+            onWindowClose = ::exitApplication,
+            onWindowMinimize = { window.state = Frame.ICONIFIED },
+            onWindowToggleMaximize = {
+                val maximized = (window.extendedState and Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH
+                window.extendedState = if (maximized) Frame.NORMAL else Frame.MAXIMIZED_BOTH
             },
         )
     }
