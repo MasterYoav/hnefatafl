@@ -14,6 +14,8 @@ data class VikingsChessUiState(
     val highlightedMoves: Set<Position> = emptySet(),
     val redTeamWins: Int = 0,
     val blueTeamWins: Int = 0,
+    val settings: UiSettings = defaultUiSettings(),
+    val settingsDraft: UiSettings = defaultUiSettings(),
 )
 
 class BoardViewModel(
@@ -55,6 +57,68 @@ class BoardViewModel(
 
     fun toggleTheme() {
         uiState = uiState.copy(isDarkMode = !uiState.isDarkMode)
+    }
+
+    fun beginSettingsEdit() {
+        uiState = uiState.copy(settingsDraft = uiState.settings)
+    }
+
+    fun cancelSettingsEdit() {
+        uiState = uiState.copy(settingsDraft = uiState.settings)
+    }
+
+    fun updatePawnColor(target: PawnColorTarget, value: String) {
+        val pawn = uiState.settingsDraft.pawnColors
+        val updated = when (target) {
+            PawnColorTarget.ATTACKER -> pawn.copy(attackerHex = value)
+            PawnColorTarget.DEFENDER -> pawn.copy(defenderHex = value)
+            PawnColorTarget.KING -> pawn.copy(kingHex = value)
+        }
+        uiState = uiState.copy(settingsDraft = uiState.settingsDraft.copy(pawnColors = updated))
+    }
+
+    fun updateBackgroundMode(mode: BackgroundMode) {
+        uiState = uiState.copy(
+            settingsDraft = uiState.settingsDraft.copy(
+                background = uiState.settingsDraft.background.copy(mode = mode),
+            ),
+        )
+    }
+
+    fun updateBackgroundSolidHex(value: String) {
+        uiState = uiState.copy(
+            settingsDraft = uiState.settingsDraft.copy(
+                background = uiState.settingsDraft.background.copy(solidHex = value),
+            ),
+        )
+    }
+
+    fun updateBackgroundOpacity(value: Float) {
+        uiState = uiState.copy(
+            settingsDraft = uiState.settingsDraft.copy(
+                background = uiState.settingsDraft.background.copy(opacity = value.coerceIn(0.1f, 1f)),
+            ),
+        )
+    }
+
+    fun updateBackgroundImagePath(path: String?) {
+        uiState = uiState.copy(
+            settingsDraft = uiState.settingsDraft.copy(
+                background = uiState.settingsDraft.background.copy(imagePath = path),
+            ),
+        )
+    }
+
+    fun applySettings(): Boolean {
+        val draft = uiState.settingsDraft
+        if (!settingsValidation(draft).isValid) return false
+        uiState = uiState.copy(settings = draft, settingsDraft = draft)
+        return true
+    }
+
+    fun resetSettings() {
+        val defaults = defaultUiSettings()
+        uiState = uiState.copy(settings = defaults, settingsDraft = defaults)
     }
 
     private fun sync() {
