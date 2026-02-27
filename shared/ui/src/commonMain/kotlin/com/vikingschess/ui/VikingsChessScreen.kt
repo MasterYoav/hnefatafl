@@ -50,7 +50,7 @@ fun VikingsChessApp(viewModel: BoardViewModel = remember { BoardViewModel() }) {
             modifier = Modifier
                 .fillMaxSize()
                 .background(bg)
-                .padding(20.dp),
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
@@ -73,7 +73,7 @@ fun VikingsChessApp(viewModel: BoardViewModel = remember { BoardViewModel() }) {
                 modifier = Modifier
                     .clip(RoundedCornerShape(20.dp))
                     .background(surface)
-                    .padding(10.dp),
+                    .padding(8.dp),
             ) {
                 for (row in 0 until state.board.size) {
                     Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -91,8 +91,8 @@ fun VikingsChessApp(viewModel: BoardViewModel = remember { BoardViewModel() }) {
 
                             Box(
                                 modifier = Modifier
-                                    .size(40.dp)
-                                    .clip(RoundedCornerShape(10.dp))
+                                    .size(34.dp)
+                                    .clip(RoundedCornerShape(9.dp))
                                     .background(cellBg)
                                     .border(
                                         width = if (selected) 2.dp else 1.dp,
@@ -101,7 +101,7 @@ fun VikingsChessApp(viewModel: BoardViewModel = remember { BoardViewModel() }) {
                                             isMoveHint -> if (ui.isDarkMode) Color(0xFF7CEEC4) else Color(0xFF2C8F72)
                                             else -> Color(0x33000000)
                                         },
-                                        shape = RoundedCornerShape(10.dp),
+                                        shape = RoundedCornerShape(9.dp),
                                     )
                                     .clickable { viewModel.onCellTapped(pos) },
                                 contentAlignment = Alignment.Center,
@@ -129,7 +129,7 @@ fun VikingsChessApp(viewModel: BoardViewModel = remember { BoardViewModel() }) {
                                     Box(
                                         modifier = Modifier
                                             .scale(pieceScale.value)
-                                            .size(if (piece.type == PieceType.KING) 29.dp else 25.dp)
+                                            .size(if (piece.type == PieceType.KING) 23.dp else 20.dp)
                                             .clip(CircleShape)
                                             .background(
                                                 Brush.verticalGradient(
