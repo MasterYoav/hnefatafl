@@ -10,6 +10,8 @@ fun main() = application {
         title = "Hnefatafl",
         transparent = false,
     ) {
+        window.rootPane.putClientProperty("apple.awt.transparentTitleBar", true)
+        window.rootPane.putClientProperty("apple.awt.fullWindowContent", true)
         VikingsChessApp()
     }
 }
