@@ -23,7 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
@@ -216,9 +215,9 @@ private fun GlassButton(
     onClick: () -> Unit,
 ) {
     val interaction = remember { MutableInteractionSource() }
-    val top = if (isDarkMode) Color(0x66FFFFFF) else Color(0xB3FFFFFF)
-    val bottom = if (isDarkMode) Color(0x2AFFFFFF) else Color(0x66FFFFFF)
-    val outline = if (isDarkMode) Color(0xAAFFFFFF) else Color(0x99D6E4FF)
+    val top = if (isDarkMode) Color(0x30FFFFFF) else Color(0x55FFFFFF)
+    val bottom = if (isDarkMode) Color(0x10FFFFFF) else Color(0x22FFFFFF)
+    val outline = if (isDarkMode) Color(0x99FFFFFF) else Color(0x99C6D8F5)
     val textColor = if (enabled) {
         if (isDarkMode) Color.White else Color(0xFF1D2A3B)
     } else {
@@ -227,16 +226,16 @@ private fun GlassButton(
 
     Box(
         modifier = Modifier
-            .clip(RoundedCornerShape(999.dp))
+            .clip(RoundedCornerShape(14.dp))
             .background(Brush.verticalGradient(listOf(top, bottom)))
-            .border(1.dp, outline, RoundedCornerShape(999.dp))
+            .border(1.dp, outline, RoundedCornerShape(14.dp))
             .clickable(
                 enabled = enabled,
                 interactionSource = interaction,
                 indication = null,
                 onClick = onClick,
             )
-            .padding(horizontal = 18.dp, vertical = 10.dp),
+            .padding(horizontal = 16.dp, vertical = 9.dp),
     ) {
         Text(
             text = label,

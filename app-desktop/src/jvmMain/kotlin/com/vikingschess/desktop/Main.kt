@@ -8,7 +8,7 @@ fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
         title = "VikingsChess-Next",
-        transparent = true,
+        transparent = false,
     ) {
         VikingsChessApp()
     }
