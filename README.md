@@ -50,6 +50,7 @@ For players, use packaged releases from GitHub Releases:
 - **macOS:** `.dmg`
 - **Windows:** `.exe` / `.msi`
 - **Linux:** `.deb`
+- **Android:** `.apk` (debug + release-unsigned)
 
 These bundles include required runtime components.
 
@@ -109,7 +110,7 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-This builds platform-native installers and attaches them to the GitHub Release.
+This builds platform-native installers and attaches them to the GitHub Release, including Android APK artifacts.
 
 ---
 
