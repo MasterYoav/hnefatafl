@@ -7,7 +7,7 @@ import com.vikingschess.ui.VikingsChessApp
 fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
-        title = "VikingsChess-Next",
+        title = "Hnefatafl",
         transparent = false,
     ) {
         VikingsChessApp()

@@ -199,7 +199,7 @@ private fun GlassToolbar(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 4.dp, vertical = 4.dp),
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
     ) {
         GlassButton("New Game", enabled = true, isDarkMode = isDarkMode, onClick = onNewGame)
         GlassButton("Undo", enabled = canUndo, isDarkMode = isDarkMode, onClick = onUndo)
