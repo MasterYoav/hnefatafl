@@ -5,7 +5,7 @@ import androidx.compose.ui.window.application
 import com.vikingschess.ui.VikingsChessApp
 
 fun main() = application {
-    Window(onCloseRequest = ::exitApplication, title = "VikingsChess-Next") {
+    Window(onCloseRequest = ::exitApplication, title = "Hnefatafl") {
         VikingsChessApp()
     }
 }

@@ -20,7 +20,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,6 +43,7 @@ import com.vikingschess.logic.Winner
 fun VikingsChessApp(viewModel: BoardViewModel = remember { BoardViewModel() }) {
     val ui = viewModel.uiState
     val state = ui.game
+    var showRules by remember { mutableStateOf(false) }
 
     val bg = if (ui.isDarkMode) Color(0xFF0B1220) else Color(0xFFF4F7FB)
     val surface = if (ui.isDarkMode) Color(0x4D1E2530) else Color(0x66FFFFFF)
@@ -63,6 +67,7 @@ fun VikingsChessApp(viewModel: BoardViewModel = remember { BoardViewModel() }) {
                 onNewGame = viewModel::newGame,
                 onUndo = viewModel::undo,
                 onToggleTheme = viewModel::toggleTheme,
+                onRules = { showRules = true },
             )
 
             Text(
@@ -176,13 +181,12 @@ fun VikingsChessApp(viewModel: BoardViewModel = remember { BoardViewModel() }) {
                 }
             }
 
-            Text(
-                text = "Rule set: 11x11 Hnefatafl · Blue escorts king to corners · Red captures king on 4 sides",
-                color = textPrimary,
-                fontSize = 13.sp,
-                fontFamily = roundedFont,
-                fontWeight = FontWeight.Bold,
-            )
+            if (showRules) {
+                RulesDialog(
+                    isDarkMode = ui.isDarkMode,
+                    onClose = { showRules = false },
+                )
+            }
         }
     }
 }
@@ -194,6 +198,7 @@ private fun GlassToolbar(
     onNewGame: () -> Unit,
     onUndo: () -> Unit,
     onToggleTheme: () -> Unit,
+    onRules: () -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -204,6 +209,7 @@ private fun GlassToolbar(
         GlassButton("New Game", enabled = true, isDarkMode = isDarkMode, onClick = onNewGame)
         GlassButton("Undo", enabled = canUndo, isDarkMode = isDarkMode, onClick = onUndo)
         GlassButton(if (isDarkMode) "Light" else "Dark", enabled = true, isDarkMode = isDarkMode, onClick = onToggleTheme)
+        GlassButton("Game Rules", enabled = true, isDarkMode = isDarkMode, onClick = onRules)
     }
 }
 
@@ -241,6 +247,42 @@ private fun GlassButton(
             fontFamily = FontFamily.SansSerif,
             fontWeight = FontWeight.Bold,
         )
+    }
+}
+
+@Composable
+private fun RulesDialog(
+    isDarkMode: Boolean,
+    onClose: () -> Unit,
+) {
+    val cardBg = if (isDarkMode) Color(0xEE182333) else Color(0xF7FFFFFF)
+    val textColor = if (isDarkMode) Color(0xFFF0F5FF) else Color(0xFF1C2A3C)
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0x66000000))
+            .clickable(onClick = onClose),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(
+            modifier = Modifier
+                .clip(RoundedCornerShape(16.dp))
+                .background(cardBg)
+                .border(1.dp, Color(0x66FFFFFF), RoundedCornerShape(16.dp))
+                .padding(18.dp)
+                .clickable(enabled = false) {},
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Text("Game Rules", color = textColor, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text("• Blue Team: help the king reach any corner", color = textColor, fontSize = 14.sp)
+            Text("• Red Team: capture the king by surrounding all 4 sides", color = textColor, fontSize = 14.sp)
+            Text("• All pieces move orthogonally any distance", color = textColor, fontSize = 14.sp)
+            Text("• No jumping over pieces", color = textColor, fontSize = 14.sp)
+            Text("• Only king may enter corner cells", color = textColor, fontSize = 14.sp)
+            Text("• Pawn capture: sandwich enemy between two allies or ally + board edge", color = textColor, fontSize = 14.sp)
+            GlassButton("Close", enabled = true, isDarkMode = isDarkMode, onClick = onClose)
+        }
     }
 }
 
