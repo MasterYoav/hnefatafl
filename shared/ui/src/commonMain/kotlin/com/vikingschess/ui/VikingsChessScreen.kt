@@ -28,6 +28,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,16 +42,19 @@ fun VikingsChessApp(viewModel: BoardViewModel = remember { BoardViewModel() }) {
     val ui = viewModel.uiState
     val state = ui.game
 
-    val bg = if (ui.isDarkMode) Color(0xFF111316) else Color(0xFFEFF4FA)
-    val surface = if (ui.isDarkMode) Color(0x40FFFFFF) else Color(0x99FFFFFF)
+    val bg = Color.Transparent
+    val surface = if (ui.isDarkMode) Color(0x4D1E2530) else Color(0x66FFFFFF)
     val textPrimary = if (ui.isDarkMode) Color(0xFFF2F4F8) else Color(0xFF121722)
     val textSecondary = if (ui.isDarkMode) Color(0xFFB6BCC8) else Color(0xFF3B465B)
+
+    val roundedFont = FontFamily.SansSerif
 
     MaterialTheme {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(bg)
+                .blur(20.dp)
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(14.dp),
@@ -67,13 +71,16 @@ fun VikingsChessApp(viewModel: BoardViewModel = remember { BoardViewModel() }) {
                 text = statusText(state.currentTurn, state.winner),
                 color = if (state.winner == null) textSecondary else Color(0xFF7CFFB2),
                 fontSize = 15.sp,
+                fontFamily = roundedFont,
+                fontWeight = FontWeight.Bold,
             )
 
             Text(
                 text = "Red Team: ${ui.redTeamWins}   •   Blue Team: ${ui.blueTeamWins}",
                 color = textPrimary,
                 fontSize = 13.sp,
-                fontWeight = FontWeight.SemiBold,
+                fontFamily = roundedFont,
+                fontWeight = FontWeight.Bold,
             )
 
             BoxWithConstraints(
@@ -175,6 +182,8 @@ fun VikingsChessApp(viewModel: BoardViewModel = remember { BoardViewModel() }) {
                 text = "Rule set: 11x11 Hnefatafl · Blue escorts king to corners · Red captures king on 4 sides",
                 color = textPrimary,
                 fontSize = 13.sp,
+                fontFamily = roundedFont,
+                fontWeight = FontWeight.Bold,
             )
         }
     }
@@ -188,13 +197,15 @@ private fun GlassToolbar(
     onUndo: () -> Unit,
     onToggleTheme: () -> Unit,
 ) {
+    val barColor = if (isDarkMode) Color(0x6634404F) else Color(0x88EAF2FF)
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(24.dp))
-            .background(if (isDarkMode) Color(0x2EFFFFFF) else Color(0xBBFFFFFF))
-            .blur(0.2.dp)
-            .padding(horizontal = 10.dp, vertical = 8.dp),
+            .clip(RoundedCornerShape(28.dp))
+            .background(barColor)
+            .border(1.dp, Color(0x66FFFFFF), RoundedCornerShape(28.dp))
+            .blur(10.dp)
+            .padding(horizontal = 12.dp, vertical = 10.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         GlassButton("New Game", enabled = true, onClick = onNewGame)
@@ -210,26 +221,35 @@ private fun GlassButton(
     onClick: () -> Unit,
 ) {
     val interaction = remember { MutableInteractionSource() }
-    val base = if (enabled) Color(0x44FFFFFF) else Color(0x22FFFFFF)
+    val capsule = if (enabled) Color(0x55FFFFFF) else Color(0x33FFFFFF)
 
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(999.dp))
-            .background(base)
-            .border(1.dp, Color(0x66FFFFFF), RoundedCornerShape(999.dp))
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        capsule.copy(alpha = 0.75f),
+                        capsule.copy(alpha = 0.35f),
+                    ),
+                ),
+            )
+            .border(1.dp, Color(0x99FFFFFF), RoundedCornerShape(999.dp))
+            .blur(3.dp)
             .clickable(
                 enabled = enabled,
                 interactionSource = interaction,
                 indication = null,
                 onClick = onClick,
             )
-            .padding(horizontal = 14.dp, vertical = 8.dp),
+            .padding(horizontal = 18.dp, vertical = 10.dp),
     ) {
         Text(
             text = label,
             color = if (enabled) Color.White else Color(0x88FFFFFF),
             fontSize = 13.sp,
-            fontWeight = FontWeight.Medium,
+            fontFamily = FontFamily.SansSerif,
+            fontWeight = FontWeight.Bold,
         )
     }
 }
