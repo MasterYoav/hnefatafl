@@ -33,8 +33,9 @@ fun main() = application {
             onPickColor = { current -> pickColorHex(window as? Frame, current) },
             imagePainter = ::loadImagePainter,
             onThemeChanged = { isDarkMode = it },
-            onTransparencyModeChanged = { transparent ->
-                window.background = if (transparent) java.awt.Color(0, 0, 0, 0) else java.awt.Color(11, 18, 32, 255)
+            onTransparencyModeChanged = {
+                // Keep transparent window background always to preserve rounded corners.
+                window.background = java.awt.Color(0, 0, 0, 0)
             },
             onWindowClose = ::exitApplication,
             onWindowMinimize = { window.state = Frame.ICONIFIED },
@@ -43,7 +44,18 @@ fun main() = application {
                 window.extendedState = if (maximized) Frame.NORMAL else Frame.MAXIMIZED_BOTH
             },
             onWindowDrag = { dx, dy ->
-                window.setLocation(window.x + dx.toInt(), window.y + dy.toInt())
+                // Guard against occasional huge drag deltas from gesture bursts.
+                if (kotlin.math.abs(dx) > 180f || kotlin.math.abs(dy) > 180f) return@VikingsChessApp
+
+                val screenBounds = java.awt.GraphicsEnvironment
+                    .getLocalGraphicsEnvironment()
+                    .defaultScreenDevice
+                    .defaultConfiguration
+                    .bounds
+
+                val nextX = (window.x + dx.toInt()).coerceIn(screenBounds.x - window.width + 120, screenBounds.x + screenBounds.width - 120)
+                val nextY = (window.y + dy.toInt()).coerceIn(screenBounds.y, screenBounds.y + screenBounds.height - 80)
+                window.setLocation(nextX, nextY)
             },
         )
     }

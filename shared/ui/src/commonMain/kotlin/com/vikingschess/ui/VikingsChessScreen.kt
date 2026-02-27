@@ -98,7 +98,12 @@ fun VikingsChessApp(
     }
 
     MaterialTheme {
-        Box(modifier = Modifier.fillMaxSize().background(baseBg)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(RoundedCornerShape(24.dp))
+                .background(baseBg),
+        ) {
             if (settings.background.mode == BackgroundMode.SOLID && solidColor != null) {
                 Box(
                     modifier = Modifier
@@ -115,11 +120,20 @@ fun VikingsChessApp(
                 )
             }
             if (settings.background.mode == BackgroundMode.TRANSPARENT) {
+                val blurStrength = settings.background.blur.coerceIn(0f, 1f)
+                val tintAlpha = settings.background.opacity * (0.25f + blurStrength * 0.75f)
+                val frostAlpha = 0.08f + blurStrength * 0.22f
+
+                // Frosted-glass approximation in Compose Desktop (visible response to blur slider).
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .blur((settings.background.blur * 28f).dp)
-                        .background(Color(0xCC0B1220).copy(alpha = settings.background.opacity)),
+                        .background(Color(0xCC0B1220).copy(alpha = tintAlpha)),
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.White.copy(alpha = frostAlpha * settings.background.opacity)),
                 )
             }
 
