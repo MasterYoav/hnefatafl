@@ -54,7 +54,6 @@ fun VikingsChessApp(viewModel: BoardViewModel = remember { BoardViewModel() }) {
             modifier = Modifier
                 .fillMaxSize()
                 .background(bg)
-                .blur(20.dp)
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(14.dp),
