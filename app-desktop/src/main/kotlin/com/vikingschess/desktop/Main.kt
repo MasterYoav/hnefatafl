@@ -16,7 +16,7 @@ import javax.swing.JColorChooser
 import org.jetbrains.skia.Image
 
 fun main() = application {
-    Window(onCloseRequest = ::exitApplication, title = "Hnefatafl", transparent = true) {
+    Window(onCloseRequest = ::exitApplication, title = "Hnefatafl", transparent = false) {
         var isDarkMode by mutableStateOf(true)
         window.rootPane.putClientProperty("apple.awt.transparentTitleBar", true)
         window.rootPane.putClientProperty("apple.awt.fullWindowContent", true)
