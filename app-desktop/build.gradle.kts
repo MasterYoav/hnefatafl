@@ -18,7 +18,7 @@ compose.desktop {
 
         nativeDistributions {
             packageName = "Hnefatafl"
-            packageVersion = "1.0.0"
+            packageVersion = "1.0.2"
             description = "Modern Hnefatafl with polished desktop UI"
             copyright = "© Yoav"
             vendor = "MasterYoav"
@@ -29,6 +29,16 @@ compose.desktop {
                 TargetFormat.Exe,
                 TargetFormat.Deb,
             )
+
+            macOS {
+                iconFile.set(rootProject.file("assets/icon.icns"))
+            }
+            windows {
+                iconFile.set(rootProject.file("assets/icon.ico"))
+            }
+            linux {
+                iconFile.set(rootProject.file("assets/icon.png"))
+            }
         }
     }
 }
