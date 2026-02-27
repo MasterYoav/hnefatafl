@@ -58,7 +58,6 @@ fun VikingsChessApp(
     onPickColor: (String) -> String? = { null },
     imagePainter: (String) -> Painter? = { null },
     onThemeChanged: (Boolean) -> Unit = {},
-    onTransparencyModeChanged: (Boolean) -> Unit = {},
     onWindowClose: () -> Unit = {},
     onWindowMinimize: () -> Unit = {},
     onWindowToggleMaximize: () -> Unit = {},
@@ -95,7 +94,6 @@ fun VikingsChessApp(
 
     SideEffect {
         onThemeChanged(ui.isDarkMode)
-        onTransparencyModeChanged(transparentMode)
     }
 
     MaterialTheme {

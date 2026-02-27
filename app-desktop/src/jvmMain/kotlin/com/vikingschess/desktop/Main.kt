@@ -1,8 +1,5 @@
 package com.vikingschess.desktop
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toComposeImageBitmap
@@ -22,16 +19,10 @@ fun main() = application {
         undecorated = false,
         transparent = false,
     ) {
-        var isDarkMode by mutableStateOf(true)
         VikingsChessApp(
             onPickImage = { pickImagePath(window) },
             onPickColor = { current -> pickColorHex(window as? Frame, current) },
             imagePainter = ::loadImagePainter,
-            onThemeChanged = { isDarkMode = it },
-            onTransparencyModeChanged = {
-                // Keep decorated window stable; transparency is rendered in-app only.
-                window.background = java.awt.Color(11, 18, 32, 255)
-            },
         )
     }
 }
