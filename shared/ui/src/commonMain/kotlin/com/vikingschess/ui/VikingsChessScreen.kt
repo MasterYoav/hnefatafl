@@ -62,6 +62,7 @@ fun VikingsChessApp(
     onWindowClose: () -> Unit = {},
     onWindowMinimize: () -> Unit = {},
     onWindowToggleMaximize: () -> Unit = {},
+    onWindowDragStart: () -> Unit = {},
     onWindowDrag: (Float, Float) -> Unit = { _, _ -> },
 ) {
     val ui = viewModel.uiState
@@ -121,19 +122,23 @@ fun VikingsChessApp(
             }
             if (settings.background.mode == BackgroundMode.TRANSPARENT) {
                 val blurStrength = settings.background.blur.coerceIn(0f, 1f)
-                val tintAlpha = settings.background.opacity * (0.25f + blurStrength * 0.75f)
-                val frostAlpha = 0.08f + blurStrength * 0.22f
+                val opacity = settings.background.opacity.coerceIn(0f, 1f)
 
-                // Frosted-glass approximation in Compose Desktop (visible response to blur slider).
+                // Less gray, more Apple-like frosted glass (cool white/blue layers).
+                val coolTint = Color(0xE6DDEBFF).copy(alpha = opacity * (0.05f + blurStrength * 0.20f))
+                val whiteFrost = Color.White.copy(alpha = opacity * (0.03f + blurStrength * 0.14f))
+                val edgeGlow = Color(0xB3CFE2FF).copy(alpha = opacity * (0.02f + blurStrength * 0.10f))
+
+                Box(modifier = Modifier.fillMaxSize().background(coolTint))
+                Box(modifier = Modifier.fillMaxSize().background(whiteFrost))
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color(0xCC0B1220).copy(alpha = tintAlpha)),
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.White.copy(alpha = frostAlpha * settings.background.opacity)),
+                        .background(
+                            Brush.verticalGradient(
+                                listOf(edgeGlow, Color.Transparent, edgeGlow.copy(alpha = edgeGlow.alpha * 0.6f)),
+                            ),
+                        ),
                 )
             }
 
@@ -149,6 +154,7 @@ fun VikingsChessApp(
                     onClose = onWindowClose,
                     onMinimize = onWindowMinimize,
                     onToggleMaximize = onWindowToggleMaximize,
+                    onDragStart = onWindowDragStart,
                     onDrag = onWindowDrag,
                 )
 
@@ -332,6 +338,7 @@ private fun CustomTitleBar(
     onClose: () -> Unit,
     onMinimize: () -> Unit,
     onToggleMaximize: () -> Unit,
+    onDragStart: () -> Unit,
     onDrag: (Float, Float) -> Unit,
 ) {
     val titleColor = if (isDarkMode) Color(0xFFEFF5FF) else Color(0xFF243246)
@@ -339,10 +346,13 @@ private fun CustomTitleBar(
         modifier = Modifier
             .fillMaxWidth()
             .pointerInput(Unit) {
-                detectDragGestures { change, dragAmount ->
-                    change.consume()
-                    onDrag(dragAmount.x, dragAmount.y)
-                }
+                detectDragGestures(
+                    onDragStart = { onDragStart() },
+                    onDrag = { change, dragAmount ->
+                        change.consume()
+                        onDrag(dragAmount.x, dragAmount.y)
+                    },
+                )
             },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,

@@ -26,6 +26,8 @@ fun main() = application {
         transparent = true,
     ) {
         var isDarkMode by mutableStateOf(true)
+        var dragStartPointer = java.awt.Point(0, 0)
+        var dragStartWindow = java.awt.Point(0, 0)
         applyRoundedWindow(window)
 
         VikingsChessApp(
@@ -43,9 +45,17 @@ fun main() = application {
                 val maximized = (window.extendedState and Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH
                 window.extendedState = if (maximized) Frame.NORMAL else Frame.MAXIMIZED_BOTH
             },
-            onWindowDrag = { dx, dy ->
-                // Guard against occasional huge drag deltas from gesture bursts.
-                if (kotlin.math.abs(dx) > 180f || kotlin.math.abs(dy) > 180f) return@VikingsChessApp
+            onWindowDragStart = {
+                val p = java.awt.MouseInfo.getPointerInfo()?.location
+                if (p != null) {
+                    dragStartPointer = p
+                    dragStartWindow = java.awt.Point(window.x, window.y)
+                }
+            },
+            onWindowDrag = { _, _ ->
+                val p = java.awt.MouseInfo.getPointerInfo()?.location ?: return@VikingsChessApp
+                val dx = p.x - dragStartPointer.x
+                val dy = p.y - dragStartPointer.y
 
                 val screenBounds = java.awt.GraphicsEnvironment
                     .getLocalGraphicsEnvironment()
@@ -53,8 +63,8 @@ fun main() = application {
                     .defaultConfiguration
                     .bounds
 
-                val nextX = (window.x + dx.toInt()).coerceIn(screenBounds.x - window.width + 120, screenBounds.x + screenBounds.width - 120)
-                val nextY = (window.y + dy.toInt()).coerceIn(screenBounds.y, screenBounds.y + screenBounds.height - 80)
+                val nextX = (dragStartWindow.x + dx).coerceIn(screenBounds.x - window.width + 120, screenBounds.x + screenBounds.width - 120)
+                val nextY = (dragStartWindow.y + dy).coerceIn(screenBounds.y, screenBounds.y + screenBounds.height - 80)
                 window.setLocation(nextX, nextY)
             },
         )
