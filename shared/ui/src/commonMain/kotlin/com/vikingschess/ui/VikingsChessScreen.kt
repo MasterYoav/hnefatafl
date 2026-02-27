@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -75,76 +76,94 @@ fun VikingsChessApp(viewModel: BoardViewModel = remember { BoardViewModel() }) {
                 fontWeight = FontWeight.SemiBold,
             )
 
-            Column(
-                verticalArrangement = Arrangement.spacedBy(2.dp),
+            BoxWithConstraints(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(surface)
-                    .padding(8.dp),
+                    .fillMaxWidth()
+                    .weight(1f),
+                contentAlignment = Alignment.TopCenter,
             ) {
-                for (row in 0 until state.board.size) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                        for (col in 0 until state.board.size) {
-                            val pos = Position(row, col)
-                            val piece = state.board[pos]
-                            val selected = state.selected == pos
-                            val isCorner = state.board.isCorner(pos)
-                            val isMoveHint = pos in ui.highlightedMoves
-                            val cellBg = when {
-                                isCorner -> if (ui.isDarkMode) Color(0xFF7E5D2B) else Color(0xFFE6C37A)
-                                (row + col) % 2 == 0 -> if (ui.isDarkMode) Color(0xFF2B313A) else Color(0xFFDCE4F0)
-                                else -> if (ui.isDarkMode) Color(0xFF20262E) else Color(0xFFCFD8E6)
-                            }
+                val boardSide = minOf(maxWidth, maxHeight)
+                val outerPadding = (boardSide * 0.02f).coerceIn(6.dp, 12.dp)
+                val gap = (boardSide * 0.004f).coerceIn(1.dp, 3.dp)
+                val cellSize = ((boardSide - (outerPadding * 2) - (gap * (state.board.size - 1))) / state.board.size)
+                    .coerceIn(18.dp, 56.dp)
+                val pieceSize = (cellSize * 0.6f).coerceIn(12.dp, 34.dp)
+                val kingPieceSize = (cellSize * 0.68f).coerceIn(14.dp, 38.dp)
+                val hintSize = (cellSize * 0.22f).coerceIn(4.dp, 12.dp)
+                val cornerRadius = (cellSize * 0.26f).coerceIn(5.dp, 14.dp)
 
-                            Box(
-                                modifier = Modifier
-                                    .size(34.dp)
-                                    .clip(RoundedCornerShape(9.dp))
-                                    .background(cellBg)
-                                    .border(
-                                        width = if (selected) 2.dp else 1.dp,
-                                        color = when {
-                                            selected -> Color(0xFF9AE8C5)
-                                            isMoveHint -> if (ui.isDarkMode) Color(0xFF7CEEC4) else Color(0xFF2C8F72)
-                                            else -> Color(0x33000000)
-                                        },
-                                        shape = RoundedCornerShape(9.dp),
-                                    )
-                                    .clickable { viewModel.onCellTapped(pos) },
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                if (isMoveHint && piece.type == PieceType.EMPTY) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(9.dp)
-                                            .clip(CircleShape)
-                                            .background(if (ui.isDarkMode) Color(0xB37CEEC4) else Color(0x992C8F72)),
-                                    )
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(gap),
+                    modifier = Modifier
+                        .size(boardSide)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(surface)
+                        .padding(outerPadding),
+                ) {
+                    for (row in 0 until state.board.size) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(gap)) {
+                            for (col in 0 until state.board.size) {
+                                val pos = Position(row, col)
+                                val piece = state.board[pos]
+                                val selected = state.selected == pos
+                                val isCorner = state.board.isCorner(pos)
+                                val isMoveHint = pos in ui.highlightedMoves
+                                val cellBg = when {
+                                    isCorner -> if (ui.isDarkMode) Color(0xFF7E5D2B) else Color(0xFFE6C37A)
+                                    (row + col) % 2 == 0 -> if (ui.isDarkMode) Color(0xFF2B313A) else Color(0xFFDCE4F0)
+                                    else -> if (ui.isDarkMode) Color(0xFF20262E) else Color(0xFFCFD8E6)
                                 }
 
-                                if (piece.type != PieceType.EMPTY) {
-                                    val pieceColor = when (piece.type) {
-                                        PieceType.ATTACKER -> Color(0xFFD64545)
-                                        PieceType.DEFENDER -> Color(0xFF4B7CF0)
-                                        PieceType.KING -> Color(0xFFFFD66E)
-                                        PieceType.EMPTY -> Color.Transparent
+                                Box(
+                                    modifier = Modifier
+                                        .size(cellSize)
+                                        .clip(RoundedCornerShape(cornerRadius))
+                                        .background(cellBg)
+                                        .border(
+                                            width = if (selected) 2.dp else 1.dp,
+                                            color = when {
+                                                selected -> Color(0xFF9AE8C5)
+                                                isMoveHint -> if (ui.isDarkMode) Color(0xFF7CEEC4) else Color(0xFF2C8F72)
+                                                else -> Color(0x33000000)
+                                            },
+                                            shape = RoundedCornerShape(cornerRadius),
+                                        )
+                                        .clickable { viewModel.onCellTapped(pos) },
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    if (isMoveHint && piece.type == PieceType.EMPTY) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(hintSize)
+                                                .clip(CircleShape)
+                                                .background(if (ui.isDarkMode) Color(0xB37CEEC4) else Color(0x992C8F72)),
+                                        )
                                     }
-                                    val pieceScale = animateFloatAsState(
-                                        targetValue = if (selected) 1.08f else 1f,
-                                        animationSpec = spring(dampingRatio = 0.62f, stiffness = 460f),
-                                    )
-                                    Box(
-                                        modifier = Modifier
-                                            .scale(pieceScale.value)
-                                            .size(if (piece.type == PieceType.KING) 23.dp else 20.dp)
-                                            .clip(CircleShape)
-                                            .background(
-                                                Brush.verticalGradient(
-                                                    listOf(pieceColor.copy(alpha = 0.95f), pieceColor.copy(alpha = 0.65f)),
-                                                ),
-                                            )
-                                            .border(1.dp, Color(0x66FFFFFF), CircleShape),
-                                    )
+
+                                    if (piece.type != PieceType.EMPTY) {
+                                        val pieceColor = when (piece.type) {
+                                            PieceType.ATTACKER -> Color(0xFFD64545)
+                                            PieceType.DEFENDER -> Color(0xFF4B7CF0)
+                                            PieceType.KING -> Color(0xFFFFD66E)
+                                            PieceType.EMPTY -> Color.Transparent
+                                        }
+                                        val pieceScale = animateFloatAsState(
+                                            targetValue = if (selected) 1.08f else 1f,
+                                            animationSpec = spring(dampingRatio = 0.62f, stiffness = 460f),
+                                        )
+                                        Box(
+                                            modifier = Modifier
+                                                .scale(pieceScale.value)
+                                                .size(if (piece.type == PieceType.KING) kingPieceSize else pieceSize)
+                                                .clip(CircleShape)
+                                                .background(
+                                                    Brush.verticalGradient(
+                                                        listOf(pieceColor.copy(alpha = 0.95f), pieceColor.copy(alpha = 0.65f)),
+                                                    ),
+                                                )
+                                                .border(1.dp, Color(0x66FFFFFF), CircleShape),
+                                        )
+                                    }
                                 }
                             }
                         }
