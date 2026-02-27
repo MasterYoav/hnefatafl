@@ -19,48 +19,18 @@ fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
         title = "Hnefatafl",
-        undecorated = true,
-        transparent = true,
+        undecorated = false,
+        transparent = false,
     ) {
         var isDarkMode by mutableStateOf(true)
-        var dragStartPointer = java.awt.Point(0, 0)
-        var dragStartWindow = java.awt.Point(0, 0)
         VikingsChessApp(
             onPickImage = { pickImagePath(window) },
             onPickColor = { current -> pickColorHex(window as? Frame, current) },
             imagePainter = ::loadImagePainter,
             onThemeChanged = { isDarkMode = it },
             onTransparencyModeChanged = {
-                // Keep transparent window background always to preserve rounded corners.
-                window.background = java.awt.Color(0, 0, 0, 0)
-            },
-            onWindowClose = ::exitApplication,
-            onWindowMinimize = { window.state = Frame.ICONIFIED },
-            onWindowToggleMaximize = {
-                val maximized = (window.extendedState and Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH
-                window.extendedState = if (maximized) Frame.NORMAL else Frame.MAXIMIZED_BOTH
-            },
-            onWindowDragStart = {
-                val p = java.awt.MouseInfo.getPointerInfo()?.location
-                if (p != null) {
-                    dragStartPointer = p
-                    dragStartWindow = java.awt.Point(window.x, window.y)
-                }
-            },
-            onWindowDrag = { _, _ ->
-                val p = java.awt.MouseInfo.getPointerInfo()?.location ?: return@VikingsChessApp
-                val dx = p.x - dragStartPointer.x
-                val dy = p.y - dragStartPointer.y
-
-                val screenBounds = java.awt.GraphicsEnvironment
-                    .getLocalGraphicsEnvironment()
-                    .defaultScreenDevice
-                    .defaultConfiguration
-                    .bounds
-
-                val nextX = (dragStartWindow.x + dx).coerceIn(screenBounds.x - window.width + 120, screenBounds.x + screenBounds.width - 120)
-                val nextY = (dragStartWindow.y + dy).coerceIn(screenBounds.y, screenBounds.y + screenBounds.height - 80)
-                window.setLocation(nextX, nextY)
+                // Keep decorated window stable; transparency is rendered in-app only.
+                window.background = java.awt.Color(11, 18, 32, 255)
             },
         )
     }

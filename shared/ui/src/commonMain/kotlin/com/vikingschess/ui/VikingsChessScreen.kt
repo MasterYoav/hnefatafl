@@ -145,19 +145,10 @@ fun VikingsChessApp(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 16.dp),
+                    .padding(start = 16.dp, end = 16.dp, top = 52.dp, bottom = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-                CustomTitleBar(
-                    isDarkMode = ui.isDarkMode,
-                    onClose = onWindowClose,
-                    onMinimize = onWindowMinimize,
-                    onToggleMaximize = onWindowToggleMaximize,
-                    onDragStart = onWindowDragStart,
-                    onDrag = onWindowDrag,
-                )
-
                 GlassToolbar(
                     isDarkMode = ui.isDarkMode,
                     canUndo = viewModel.canUndo(),
