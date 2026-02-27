@@ -196,20 +196,15 @@ private fun GlassToolbar(
     onUndo: () -> Unit,
     onToggleTheme: () -> Unit,
 ) {
-    val barColor = if (isDarkMode) Color(0x6634404F) else Color(0x88EAF2FF)
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(28.dp))
-            .background(barColor)
-            .border(1.dp, Color(0x66FFFFFF), RoundedCornerShape(28.dp))
-            .blur(10.dp)
-            .padding(horizontal = 12.dp, vertical = 10.dp),
+            .padding(horizontal = 4.dp, vertical = 4.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        GlassButton("New Game", enabled = true, onClick = onNewGame)
-        GlassButton("Undo", enabled = canUndo, onClick = onUndo)
-        GlassButton(if (isDarkMode) "Light" else "Dark", enabled = true, onClick = onToggleTheme)
+        GlassButton("New Game", enabled = true, isDarkMode = isDarkMode, onClick = onNewGame)
+        GlassButton("Undo", enabled = canUndo, isDarkMode = isDarkMode, onClick = onUndo)
+        GlassButton(if (isDarkMode) "Light" else "Dark", enabled = true, isDarkMode = isDarkMode, onClick = onToggleTheme)
     }
 }
 
@@ -217,24 +212,24 @@ private fun GlassToolbar(
 private fun GlassButton(
     label: String,
     enabled: Boolean,
+    isDarkMode: Boolean,
     onClick: () -> Unit,
 ) {
     val interaction = remember { MutableInteractionSource() }
-    val capsule = if (enabled) Color(0x55FFFFFF) else Color(0x33FFFFFF)
+    val top = if (isDarkMode) Color(0x66FFFFFF) else Color(0xB3FFFFFF)
+    val bottom = if (isDarkMode) Color(0x2AFFFFFF) else Color(0x66FFFFFF)
+    val outline = if (isDarkMode) Color(0xAAFFFFFF) else Color(0x99D6E4FF)
+    val textColor = if (enabled) {
+        if (isDarkMode) Color.White else Color(0xFF1D2A3B)
+    } else {
+        if (isDarkMode) Color(0x88FFFFFF) else Color(0x883A4C62)
+    }
 
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(999.dp))
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        capsule.copy(alpha = 0.75f),
-                        capsule.copy(alpha = 0.35f),
-                    ),
-                ),
-            )
-            .border(1.dp, Color(0x99FFFFFF), RoundedCornerShape(999.dp))
-            .blur(3.dp)
+            .background(Brush.verticalGradient(listOf(top, bottom)))
+            .border(1.dp, outline, RoundedCornerShape(999.dp))
             .clickable(
                 enabled = enabled,
                 interactionSource = interaction,
@@ -245,7 +240,7 @@ private fun GlassButton(
     ) {
         Text(
             text = label,
-            color = if (enabled) Color.White else Color(0x88FFFFFF),
+            color = textColor,
             fontSize = 13.sp,
             fontFamily = FontFamily.SansSerif,
             fontWeight = FontWeight.Bold,
