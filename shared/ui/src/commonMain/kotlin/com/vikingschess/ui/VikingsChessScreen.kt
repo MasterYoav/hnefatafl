@@ -215,20 +215,17 @@ private fun GlassButton(
     onClick: () -> Unit,
 ) {
     val interaction = remember { MutableInteractionSource() }
-    val top = if (isDarkMode) Color(0x30FFFFFF) else Color(0x55FFFFFF)
-    val bottom = if (isDarkMode) Color(0x10FFFFFF) else Color(0x22FFFFFF)
-    val outline = if (isDarkMode) Color(0x99FFFFFF) else Color(0x99C6D8F5)
+    val outline = if (isDarkMode) Color(0xCCFFFFFF) else Color(0xFF9DB4D6)
     val textColor = if (enabled) {
-        if (isDarkMode) Color.White else Color(0xFF1D2A3B)
+        if (isDarkMode) Color(0xFFF4F7FF) else Color(0xFF1D2A3B)
     } else {
-        if (isDarkMode) Color(0x88FFFFFF) else Color(0x883A4C62)
+        if (isDarkMode) Color(0x77E7EEFF) else Color(0x88435975)
     }
 
     Box(
         modifier = Modifier
-            .clip(RoundedCornerShape(10.dp))
-            .background(Brush.verticalGradient(listOf(top, bottom)))
-            .border(1.dp, outline, RoundedCornerShape(10.dp))
+            .clip(RoundedCornerShape(6.dp))
+            .border(1.dp, outline, RoundedCornerShape(6.dp))
             .clickable(
                 enabled = enabled,
                 interactionSource = interaction,
