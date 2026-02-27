@@ -103,6 +103,14 @@ class BoardViewModel(
         commitDraftIfValid()
     }
 
+    fun updateBackgroundBlur(value: Float) {
+        val nextDraft = uiState.settingsDraft.copy(
+            background = uiState.settingsDraft.background.copy(blur = value.coerceIn(0f, 1f)),
+        )
+        uiState = uiState.copy(settingsDraft = nextDraft)
+        commitDraftIfValid()
+    }
+
     fun updateBackgroundImagePath(path: String?) {
         val nextDraft = uiState.settingsDraft.copy(
             background = uiState.settingsDraft.background.copy(imagePath = path),

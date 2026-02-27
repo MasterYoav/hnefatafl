@@ -26,6 +26,7 @@ data class BackgroundSettings(
     val solidHex: String,
     val imagePath: String?,
     val opacity: Float,
+    val blur: Float,
 )
 
 data class UiSettings(
@@ -58,6 +59,7 @@ fun defaultUiSettings(): UiSettings = UiSettings(
         solidHex = DEFAULT_SOLID,
         imagePath = null,
         opacity = 0.65f,
+        blur = 0.5f,
     ),
 )
 

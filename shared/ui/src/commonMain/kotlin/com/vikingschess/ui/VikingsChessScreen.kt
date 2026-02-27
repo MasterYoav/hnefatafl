@@ -33,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
@@ -41,8 +42,10 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.gestures.detectDragGestures
 import com.vikingschess.logic.PieceType
 import com.vikingschess.logic.Player
 import com.vikingschess.logic.Position
@@ -59,6 +62,7 @@ fun VikingsChessApp(
     onWindowClose: () -> Unit = {},
     onWindowMinimize: () -> Unit = {},
     onWindowToggleMaximize: () -> Unit = {},
+    onWindowDrag: (Float, Float) -> Unit = { _, _ -> },
 ) {
     val ui = viewModel.uiState
     val state = ui.game
@@ -114,6 +118,7 @@ fun VikingsChessApp(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
+                        .blur((settings.background.blur * 28f).dp)
                         .background(Color(0xCC0B1220).copy(alpha = settings.background.opacity)),
                 )
             }
@@ -130,6 +135,7 @@ fun VikingsChessApp(
                     onClose = onWindowClose,
                     onMinimize = onWindowMinimize,
                     onToggleMaximize = onWindowToggleMaximize,
+                    onDrag = onWindowDrag,
                 )
 
                 GlassToolbar(
@@ -292,6 +298,7 @@ fun VikingsChessApp(
                         onBackgroundModeChange = viewModel::updateBackgroundMode,
                         onSolidHexChange = viewModel::updateBackgroundSolidHex,
                         onOpacityChange = viewModel::updateBackgroundOpacity,
+                        onBlurChange = viewModel::updateBackgroundBlur,
                         onPickImage = onPickImage,
                         onPickColor = onPickColor,
                         onImagePathChange = viewModel::updateBackgroundImagePath,
@@ -311,10 +318,18 @@ private fun CustomTitleBar(
     onClose: () -> Unit,
     onMinimize: () -> Unit,
     onToggleMaximize: () -> Unit,
+    onDrag: (Float, Float) -> Unit,
 ) {
     val titleColor = if (isDarkMode) Color(0xFFEFF5FF) else Color(0xFF243246)
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .pointerInput(Unit) {
+                detectDragGestures { change, dragAmount ->
+                    change.consume()
+                    onDrag(dragAmount.x, dragAmount.y)
+                }
+            },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
@@ -444,6 +459,7 @@ private fun SettingsDialog(
     onBackgroundModeChange: (BackgroundMode) -> Unit,
     onSolidHexChange: (String) -> Unit,
     onOpacityChange: (Float) -> Unit,
+    onBlurChange: (Float) -> Unit,
     onPickImage: () -> String?,
     onPickColor: (String) -> String?,
     onImagePathChange: (String?) -> Unit,
@@ -584,7 +600,30 @@ private fun SettingsDialog(
             }
 
             if (draft.background.mode == BackgroundMode.TRANSPARENT) {
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text("Blur %", color = textColor, fontSize = 13.sp)
+                        TextField(
+                            value = ((draft.background.blur * 100).toInt()).toString(),
+                            onValueChange = { raw ->
+                                raw.toIntOrNull()?.let { n -> onBlurChange((n.coerceIn(0, 100) / 100f)) }
+                            },
+                            singleLine = true,
+                            modifier = Modifier.width(90.dp),
+                            colors = TextFieldDefaults.colors(
+                                focusedTextColor = textColor,
+                                unfocusedTextColor = textColor,
+                                cursorColor = textColor,
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                            ),
+                        )
+                        Text("(default 50)", color = textColor.copy(alpha = 0.65f), fontSize = 11.sp)
+                    }
+
                     Text("Background opacity", color = textColor, fontSize = 13.sp)
                     Slider(
                         value = draft.background.opacity,

@@ -11,6 +11,9 @@ import androidx.compose.ui.window.application
 import com.vikingschess.ui.VikingsChessApp
 import java.awt.FileDialog
 import java.awt.Frame
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
+import java.awt.geom.RoundRectangle2D
 import java.io.File
 import javax.swing.JColorChooser
 import org.jetbrains.skia.Image
@@ -23,6 +26,7 @@ fun main() = application {
         transparent = true,
     ) {
         var isDarkMode by mutableStateOf(true)
+        applyRoundedWindow(window)
 
         VikingsChessApp(
             onPickImage = { pickImagePath(window) },
@@ -37,6 +41,9 @@ fun main() = application {
             onWindowToggleMaximize = {
                 val maximized = (window.extendedState and Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH
                 window.extendedState = if (maximized) Frame.NORMAL else Frame.MAXIMIZED_BOTH
+            },
+            onWindowDrag = { dx, dy ->
+                window.setLocation(window.x + dx.toInt(), window.y + dy.toInt())
             },
         )
     }
@@ -68,4 +75,15 @@ private fun loadImagePainter(path: String): Painter? {
         val image = Image.makeFromEncoded(file.readBytes())
         BitmapPainter(image.toComposeImageBitmap())
     }.getOrNull()
+}
+
+private fun applyRoundedWindow(window: java.awt.Window, arc: Double = 28.0) {
+    fun updateShape() {
+        window.shape = RoundRectangle2D.Double(0.0, 0.0, window.width.toDouble(), window.height.toDouble(), arc, arc)
+    }
+    window.addComponentListener(object : ComponentAdapter() {
+        override fun componentResized(e: ComponentEvent?) = updateShape()
+        override fun componentMoved(e: ComponentEvent?) = updateShape()
+    })
+    updateShape()
 }
