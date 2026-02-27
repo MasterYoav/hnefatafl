@@ -54,6 +54,8 @@ import com.vikingschess.logic.Winner
 @Composable
 fun VikingsChessApp(
     viewModel: BoardViewModel = remember { BoardViewModel() },
+    supportsTransparentMode: Boolean = true,
+    supportsImagePicker: Boolean = true,
     onPickImage: () -> String? = { null },
     onPickColor: (String) -> String? = { null },
     imagePainter: (String) -> Painter? = { null },
@@ -71,7 +73,7 @@ fun VikingsChessApp(
 
     val settings = ui.settings
     val draft = ui.settingsDraft
-    val transparentMode = settings.background.mode == BackgroundMode.TRANSPARENT
+    val transparentMode = supportsTransparentMode && settings.background.mode == BackgroundMode.TRANSPARENT
     val baseBg = when {
         transparentMode -> Color.Transparent
         ui.isDarkMode -> Color(0xFF0B1220)
@@ -118,7 +120,7 @@ fun VikingsChessApp(
                     modifier = Modifier.fillMaxSize(),
                 )
             }
-            if (settings.background.mode == BackgroundMode.TRANSPARENT) {
+            if (transparentMode) {
                 val blurStrength = settings.background.blur.coerceIn(0f, 1f)
                 val opacity = settings.background.opacity.coerceIn(0f, 1f)
 
@@ -308,6 +310,8 @@ fun VikingsChessApp(
                         onSolidHexChange = viewModel::updateBackgroundSolidHex,
                         onOpacityChange = viewModel::updateBackgroundOpacity,
                         onBlurChange = viewModel::updateBackgroundBlur,
+                        supportsTransparentMode = supportsTransparentMode,
+                        supportsImagePicker = supportsImagePicker,
                         onPickImage = onPickImage,
                         onPickColor = onPickColor,
                         onImagePathChange = viewModel::updateBackgroundImagePath,
@@ -468,6 +472,8 @@ private fun SettingsDialog(
     isDarkMode: Boolean,
     draft: UiSettings,
     validation: SettingsValidation,
+    supportsTransparentMode: Boolean,
+    supportsImagePicker: Boolean,
     onPawnColorChange: (PawnColorTarget, String) -> Unit,
     onBackgroundModeChange: (BackgroundMode) -> Unit,
     onSolidHexChange: (String) -> Unit,
@@ -565,13 +571,15 @@ private fun SettingsDialog(
                     textColor = textColor,
                     onClick = { onBackgroundModeChange(BackgroundMode.IMAGE) },
                 )
-                ModeChip(
-                    label = "Transparent",
-                    selected = draft.background.mode == BackgroundMode.TRANSPARENT,
-                    accent = accent,
-                    textColor = textColor,
-                    onClick = { onBackgroundModeChange(BackgroundMode.TRANSPARENT) },
-                )
+                if (supportsTransparentMode) {
+                    ModeChip(
+                        label = "Transparent",
+                        selected = draft.background.mode == BackgroundMode.TRANSPARENT,
+                        accent = accent,
+                        textColor = textColor,
+                        onClick = { onBackgroundModeChange(BackgroundMode.TRANSPARENT) },
+                    )
+                }
             }
 
             if (draft.background.mode == BackgroundMode.DEFAULT) {
@@ -603,16 +611,24 @@ private fun SettingsDialog(
                         color = textColor.copy(alpha = 0.8f),
                         fontSize = 12.sp,
                     )
-                    GlassButton("Choose image", enabled = true, isDarkMode = isDarkMode) {
-                        val picked = onPickImage()
-                        if (picked != null) {
-                            onImagePathChange(picked)
+                    if (supportsImagePicker) {
+                        GlassButton("Choose image", enabled = true, isDarkMode = isDarkMode) {
+                            val picked = onPickImage()
+                            if (picked != null) {
+                                onImagePathChange(picked)
+                            }
                         }
+                    } else {
+                        Text(
+                            text = "Image picker is not available on this platform yet",
+                            color = textColor.copy(alpha = 0.7f),
+                            fontSize = 11.sp,
+                        )
                     }
                 }
             }
 
-            if (draft.background.mode == BackgroundMode.TRANSPARENT) {
+            if (supportsTransparentMode && draft.background.mode == BackgroundMode.TRANSPARENT) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,

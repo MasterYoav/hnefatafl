@@ -67,6 +67,28 @@ These bundles include required runtime components.
 ./gradlew :app-desktop:run
 ```
 
+## Android Build & Run
+
+```bash
+# Validate desktop/shared quality gates first
+./gradlew verify
+
+# Build Android debug APK
+./gradlew :app-android:assembleDebug
+
+# Build Android release APK (unsigned)
+./gradlew :app-android:assembleRelease
+```
+
+APK outputs:
+- Debug: `app-android/build/outputs/apk/debug/app-android-debug.apk`
+- Release: `app-android/build/outputs/apk/release/app-android-release-unsigned.apk`
+
+Notes:
+- Android uses the same gameplay and settings system as desktop.
+- Transparent background mode is intentionally hidden on Android.
+- Image background mode is available, but image picking is currently disabled on Android host (desktop-only picker for now).
+
 ### Build native package for your current OS
 
 ```bash
@@ -96,7 +118,7 @@ This builds platform-native installers and attaches them to the GitHub Release.
 - `shared/logic` — rules engine + tests
 - `shared/ui` — shared Compose UI + settings system
 - `app-desktop` — desktop window host, native integrations (file/color pickers, window controls)
-- `app-android` — Android scaffold
+- `app-android` — Android app host activity + APK packaging
 
 ---
 
