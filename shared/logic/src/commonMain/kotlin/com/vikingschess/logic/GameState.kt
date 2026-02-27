@@ -66,36 +66,33 @@ data class Board(
     companion object {
         fun initial(size: Int = 11): Board {
             require(size == 11) { "Current ruleset supports 11x11 board." }
-            val cells = MutableList(size) { MutableList(size) { Piece.Empty } }
 
-            fun place(position: Position, piece: Piece) {
-                cells[position.row][position.col] = piece
+            // Kept in lockstep with the original Java VikingsChess startboard matrix:
+            // 0 = empty, 1 = attacker, 2 = defender, 3 = king
+            val startboard = listOf(
+                listOf(0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0),
+                listOf(0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0),
+                listOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+                listOf(1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1),
+                listOf(1, 0, 0, 0, 2, 2, 2, 0, 0, 0, 1),
+                listOf(1, 1, 0, 2, 2, 3, 2, 2, 0, 1, 1),
+                listOf(1, 0, 0, 0, 2, 2, 2, 0, 0, 0, 1),
+                listOf(1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1),
+                listOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+                listOf(0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0),
+                listOf(0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0),
+            )
+
+            val cells = startboard.map { row ->
+                row.map { value ->
+                    when (value) {
+                        1 -> Piece.Attacker
+                        2 -> Piece.Defender
+                        3 -> Piece.King
+                        else -> Piece.Empty
+                    }
+                }
             }
-
-            // Defenders + king (13 total = 12 defenders + king)
-            place(Position(5, 5), Piece.King)
-            val defenders = listOf(
-                Position(5, 4), Position(5, 3), Position(5, 6), Position(5, 7),
-                Position(4, 5), Position(3, 5), Position(6, 5), Position(7, 5),
-                Position(4, 4), Position(4, 6), Position(6, 4), Position(6, 6),
-            )
-            defenders.forEach { place(it, Piece.Defender) }
-
-            // Attackers (24 total)
-            val attackers = listOf(
-                Position(0, 3), Position(0, 4), Position(0, 5), Position(0, 6), Position(0, 7),
-                Position(1, 5),
-
-                Position(10, 3), Position(10, 4), Position(10, 5), Position(10, 6), Position(10, 7),
-                Position(9, 5),
-
-                Position(3, 0), Position(4, 0), Position(5, 0), Position(6, 0), Position(7, 0),
-                Position(5, 1),
-
-                Position(3, 10), Position(4, 10), Position(5, 10), Position(6, 10), Position(7, 10),
-                Position(5, 9),
-            )
-            attackers.forEach { place(it, Piece.Attacker) }
 
             return Board(size, cells)
         }

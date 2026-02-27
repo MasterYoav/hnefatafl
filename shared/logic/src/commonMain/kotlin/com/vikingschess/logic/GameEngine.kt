@@ -137,10 +137,11 @@ class GameEngine(
             Position(king.row - 1, king.col),
             Position(king.row, king.col + 1),
             Position(king.row, king.col - 1),
-        ).filter(board::isInside)
+        )
 
-        return neighbors.size >= 3 && neighbors.all { pos ->
-            board[pos].type == PieceType.ATTACKER
+        // Per original project rules: king must be surrounded on all 4 sides.
+        return neighbors.all { pos ->
+            board.isInside(pos) && board[pos].type == PieceType.ATTACKER
         }
     }
 }

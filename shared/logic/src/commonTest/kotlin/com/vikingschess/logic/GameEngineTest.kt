@@ -9,30 +9,47 @@ import kotlin.test.assertTrue
 
 class GameEngineTest {
     @Test
-    fun `initial board has expected piece counts and key positions`() {
+    fun `initial board matches original Java spawn matrix`() {
         val board = GameEngine().state().board
 
-        var attackers = 0
-        var defenders = 0
-        var kings = 0
+        val expectedAttackers = setOf(
+            Position(0, 3), Position(0, 4), Position(0, 5), Position(0, 6), Position(0, 7),
+            Position(1, 5),
+            Position(3, 0), Position(4, 0), Position(5, 0), Position(6, 0), Position(7, 0),
+            Position(5, 1),
+            Position(3, 10), Position(4, 10), Position(5, 10), Position(6, 10), Position(7, 10),
+            Position(5, 9),
+            Position(10, 3), Position(10, 4), Position(10, 5), Position(10, 6), Position(10, 7),
+            Position(9, 5),
+        )
+
+        val expectedDefenders = setOf(
+            Position(3, 5),
+            Position(4, 4), Position(4, 5), Position(4, 6),
+            Position(5, 3), Position(5, 4), Position(5, 6), Position(5, 7),
+            Position(6, 4), Position(6, 5), Position(6, 6),
+            Position(7, 5),
+        )
+
+        val attackers = mutableSetOf<Position>()
+        val defenders = mutableSetOf<Position>()
+        var king: Position? = null
 
         for (row in 0 until board.size) {
             for (col in 0 until board.size) {
-                when (board[Position(row, col)].type) {
-                    PieceType.ATTACKER -> attackers++
-                    PieceType.DEFENDER -> defenders++
-                    PieceType.KING -> kings++
+                val pos = Position(row, col)
+                when (board[pos].type) {
+                    PieceType.ATTACKER -> attackers += pos
+                    PieceType.DEFENDER -> defenders += pos
+                    PieceType.KING -> king = pos
                     PieceType.EMPTY -> Unit
                 }
             }
         }
 
-        assertEquals(24, attackers)
-        assertEquals(12, defenders)
-        assertEquals(1, kings)
-        assertEquals(PieceType.KING, board[Position(5, 5)].type)
-        assertEquals(PieceType.ATTACKER, board[Position(0, 5)].type)
-        assertEquals(PieceType.ATTACKER, board[Position(5, 0)].type)
+        assertEquals(expectedAttackers, attackers)
+        assertEquals(expectedDefenders, defenders)
+        assertEquals(Position(5, 5), king)
     }
 
     @Test
@@ -115,25 +132,9 @@ class GameEngineTest {
     }
 
     @Test
-    fun `king on edge is captured by three attackers`() {
+    fun `king on edge is not captured by three attackers because rule requires four sides`() {
         val board = emptyBoardWith(
             attackers = listOf(Position(0, 4), Position(0, 6), Position(3, 5)),
-            defenders = emptyList(),
-            king = Position(0, 5),
-        )
-        val engine = GameEngine(GameState(board = board, currentTurn = Player.ATTACKER))
-
-        engine.select(Position(3, 5))
-        val moved = engine.moveSelected(Position(1, 5))
-
-        assertTrue(moved)
-        assertEquals(Winner.ATTACKERS, engine.state().winner)
-    }
-
-    @Test
-    fun `king on edge is not captured with only two attackers`() {
-        val board = emptyBoardWith(
-            attackers = listOf(Position(0, 6), Position(3, 5)),
             defenders = emptyList(),
             king = Position(0, 5),
         )
