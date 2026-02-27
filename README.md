@@ -1,12 +1,11 @@
 # Hnefatafl
 
-Modern **Hnefatafl (Vikings Chess)** built with Kotlin + Compose Multiplatform.
+Modern **Hnefatafl (Vikings Chess)** built with OpenClaw.
 
 <p align="center">
   <img src="assets/icon-hnefatafl-tahoe26.svg" alt="Hnefatafl Icon" width="180" />
 </p>
 
-A polished desktop-first release with modern glass UI, custom themes, and full rules-based gameplay.
 [![Kotlin](https://img.shields.io/badge/Kotlin-%237F52FF.svg?logo=kotlin&logoColor=white)](#)
 [![ChatGPT](https://custom-icon-badges.demolab.com/badge/ChatGPT-74aa9c?logo=openai&logoColor=white)](#)
 ---
